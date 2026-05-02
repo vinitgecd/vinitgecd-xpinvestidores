@@ -7,17 +7,10 @@ migrate(
     app.truncateCollection(assessoresCol)
     app.truncateCollection(usersCol)
 
-    // Update password field constraint to safely allow the 7-character password ('joao123')
-    const passwordField = usersCol.fields.getByName('password')
-    if (passwordField) {
-      passwordField.min = 7
-      app.save(usersCol)
-    }
-
     // 2. Create Admin User
     const admin = new Record(usersCol)
     admin.setEmail('admin@xp.com')
-    admin.setPassword('admin123')
+    admin.setPassword('admin1234')
     admin.setVerified(true)
     admin.set('role', 'admin')
     admin.set('name', 'Admin XP')
@@ -27,7 +20,7 @@ migrate(
     const assessoresData = [
       {
         email: 'joao@xp.com',
-        password: 'joao123',
+        password: 'joao1234',
         role: 'assessor',
         nome: 'João Silva',
         especialidades: 'Renda Fixa, Títulos Públicos',
@@ -40,7 +33,7 @@ migrate(
       },
       {
         email: 'carlos@xp.com',
-        password: 'carlos123',
+        password: 'carlos1234',
         role: 'assessor',
         nome: 'Carlos Oliveira',
         especialidades: 'Ações, Fundos de Investimento',
@@ -53,7 +46,7 @@ migrate(
       },
       {
         email: 'marina@xp.com',
-        password: 'marina123',
+        password: 'marina1234',
         role: 'assessor',
         nome: 'Marina Santos',
         especialidades: 'Fundos Imobiliários, Renda Variável',
