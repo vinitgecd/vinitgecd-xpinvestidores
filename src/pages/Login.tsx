@@ -24,19 +24,28 @@ export default function Login() {
   const navigate = useNavigate()
 
   if (user) {
-    setTimeout(() => navigate(user.role === 'admin' ? '/admin/dashboard' : '/assessor/profile'), 0)
+    setTimeout(() => navigate('/dashboard'), 0)
     return null
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    const trimmedEmail = email.trim()
+    const trimmedPassword = password.trim()
+
+    if (!trimmedEmail || !trimmedPassword) {
+      setError('E-mail e senha são obrigatórios.')
+      return
+    }
+
     setIsSubmitting(true)
 
-    const result = await signIn(email, password)
+    const result = await signIn(trimmedEmail, trimmedPassword)
 
     if (result.error) {
-      setError('E-mail ou senha inválidos.')
+      setError(result.error)
       setIsSubmitting(false)
     }
   }
