@@ -2,19 +2,30 @@ import { useState } from 'react'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
+import { useAuth } from '@/hooks/use-auth'
+import { useNavigate } from 'react-router-dom'
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const { user, signOut } = useAuth()
+  const navigate = useNavigate()
 
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Sobre', href: '#assessores' },
-    { name: 'Contato', href: '#contato' },
   ]
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     setIsOpen(false)
+    if (window.location.pathname !== '/') {
+      navigate('/')
+      setTimeout(() => {
+        const element = document.querySelector(href)
+        if (element) element.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+      return
+    }
     const element = document.querySelector(href)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
@@ -22,7 +33,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
       <div className="container flex h-16 items-center justify-between px-[20px] md:px-[40px] lg:px-[60px]">
         <a
           href="#home"
@@ -44,6 +55,37 @@ export function Header() {
               {link.name}
             </a>
           ))}
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                className="text-[#003366] border-[#003366]"
+                onClick={() =>
+                  navigate(user.role === 'admin' ? '/admin/dashboard' : '/assessor/profile')
+                }
+              >
+                Dashboard
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  signOut()
+                  navigate('/')
+                }}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+              >
+                Sair
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              className="text-[#003366] border-[#003366]"
+              onClick={() => navigate('/login')}
+            >
+              Área do Assessor
+            </Button>
+          )}
         </nav>
 
         {/* Mobile Nav */}
@@ -69,6 +111,44 @@ export function Header() {
                   {link.name}
                 </a>
               ))}
+              <div className="pt-6 border-t flex flex-col space-y-4">
+                {user ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full text-[#003366] border-[#003366]"
+                      onClick={() => {
+                        setIsOpen(false)
+                        navigate(user.role === 'admin' ? '/admin/dashboard' : '/assessor/profile')
+                      }}
+                    >
+                      Dashboard
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        signOut()
+                        setIsOpen(false)
+                        navigate('/')
+                      }}
+                      className="w-full text-red-500 hover:text-red-600 hover:bg-red-50"
+                    >
+                      Sair
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="w-full text-[#003366] border-[#003366]"
+                    onClick={() => {
+                      setIsOpen(false)
+                      navigate('/login')
+                    }}
+                  >
+                    Área do Assessor
+                  </Button>
+                )}
+              </div>
             </div>
           </SheetContent>
         </Sheet>

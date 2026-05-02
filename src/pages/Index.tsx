@@ -14,75 +14,46 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInView } from '@/hooks/use-in-view'
 import { cn } from '@/lib/utils'
-
-type Advisor = {
-  id: string
-  name: string
-  specialty: string
-  education: string
-  experience: string
-  skills: string[]
-  certifications: string[]
-  image: string
-}
-
-const MOCK_ADVISORS: Advisor[] = [
-  {
-    id: '1',
-    name: 'João Silva',
-    specialty: 'Especialista em Renda Fixa',
-    education: 'Administração',
-    experience: '10 anos',
-    skills: ['Gestão de Risco', 'Alocação de Ativos'],
-    certifications: ['CEA'],
-    image: 'https://img.usecurling.com/ppl/large?gender=male&seed=1',
-  },
-  {
-    id: '2',
-    name: 'Carlos Oliveira',
-    specialty: 'Especialista em Ações',
-    education: 'Economia',
-    experience: '8 anos',
-    skills: ['Análise Fundamental', 'Day Trade'],
-    certifications: ['CNPI'],
-    image: 'https://img.usecurling.com/ppl/large?gender=male&seed=4',
-  },
-  {
-    id: '3',
-    name: 'Marina Santos',
-    specialty: 'Fundos Imobiliários',
-    education: 'Contabilidade',
-    experience: '12 anos',
-    skills: ['Planejamento Sucessório', 'Auditoria'],
-    certifications: ['CFP'],
-    image: 'https://img.usecurling.com/ppl/large?gender=female&seed=3',
-  },
-]
+import { getAssessores, Assessor } from '@/services/assessores'
+import pb from '@/lib/pocketbase/client'
 
 export default function Index() {
   const [status, setStatus] = useState<'loading' | 'error' | 'empty' | 'success'>('loading')
-  const [advisors, setAdvisors] = useState<Advisor[]>([])
+  const [advisors, setAdvisors] = useState<Assessor[]>([])
 
   const { ref: sectionRef, isInView } = useInView({ threshold: 0.1 })
 
-  const loadData = () => {
+  const loadData = async () => {
     setStatus('loading')
-    setTimeout(() => {
-      setAdvisors(MOCK_ADVISORS)
-      setStatus('success')
-    }, 1500)
+    try {
+      const data = await getAssessores()
+      setAdvisors(data)
+      setStatus(data.length === 0 ? 'empty' : 'success')
+    } catch (err) {
+      console.error(err)
+      setStatus('error')
+    }
   }
 
   useEffect(() => {
     loadData()
   }, [])
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = (assessor?: Assessor) => {
+    const phone = assessor?.whatsapp || '5511999999999'
     const text = encodeURIComponent(
       `Olá, gostaria de falar com um assessor sobre meus investimentos.`,
     )
-    window.open(`https://wa.me/5511999999999?text=${text}`, '_blank')
+    window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
   }
+
+  const parseList = (str: string) =>
+    str
+      ? str
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
 
   return (
     <div className="flex flex-col w-full text-[#333333]">
@@ -168,81 +139,105 @@ export default function Index() {
           {/* Success State */}
           {status === 'success' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {advisors.map((advisor, index) => (
-                <Card
-                  key={advisor.id}
-                  className={cn(
-                    'flex flex-col bg-white border-0 transition-all duration-300 ease-in-out',
-                    'shadow-none border-b-4 border-b-[#FF6B35]',
-                    'md:shadow-sm md:hover:shadow-xl md:hover:-translate-y-2 md:border-b-0 md:border-t-4 md:border-t-[#FF6B35]',
-                    isInView ? 'animate-fade-in opacity-100' : 'opacity-0',
-                  )}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <CardHeader className="text-center p-[24px]">
-                    <Avatar className="h-24 w-24 border-2 border-[#FF6B35] mx-auto shadow-sm mb-4">
-                      <AvatarImage
-                        src={advisor.image}
-                        alt={advisor.name}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="text-xl font-bold bg-[#F5F5F5] text-[#333333]">
-                        {advisor.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <h3 className="text-xl font-bold text-[#333333]">{advisor.name}</h3>
-                    <p className="text-[#FF6B35] font-medium text-sm mt-1">{advisor.specialty}</p>
-                  </CardHeader>
-                  <CardContent className="flex-1 p-[24px] pt-0 space-y-4">
-                    <div className="space-y-3 text-sm">
-                      <div className="flex items-center gap-3 text-[#333333]">
-                        <GraduationCap className="h-4 w-4 shrink-0 text-[#003366]" />
-                        <span>
-                          Formado em <strong className="font-semibold">{advisor.education}</strong>
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 text-[#333333]">
-                        <Briefcase className="h-4 w-4 shrink-0 text-[#003366]" />
-                        <span>
-                          <strong className="font-semibold">{advisor.experience}</strong> de
-                          experiência
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 text-[#333333]">
-                        <Award className="h-4 w-4 shrink-0 text-[#003366]" />
-                        <div className="flex flex-wrap gap-2">
-                          {advisor.certifications.map((cert) => (
-                            <Badge
-                              key={cert}
-                              variant="outline"
-                              className="px-1.5 py-0 h-5 text-[10px] border-[#003366]/20 font-bold bg-[#F5F5F5] text-[#333333]"
-                            >
-                              {cert}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+              {advisors.map((advisor, index) => {
+                const avatarUrl = advisor.foto_perfil
+                  ? pb.files.getUrl(advisor, advisor.foto_perfil)
+                  : `https://img.usecurling.com/ppl/large?seed=${advisor.id}`
 
-                    <div className="space-y-2 pt-4 border-t border-[#F5F5F5]">
-                      <p className="text-xs font-bold text-[#333333]/60 uppercase tracking-wider">
-                        Especialidades
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {advisor.skills.map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="secondary"
-                            className="bg-[#F5F5F5] text-[#333333] hover:bg-[#E5E5E5] text-xs font-medium border-0 transition-colors duration-300 ease-in-out"
-                          >
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
+                const certs = parseList(advisor.certificacoes)
+                const habilidades = parseList(advisor.habilidades)
+
+                return (
+                  <Card
+                    key={advisor.id}
+                    className={cn(
+                      'flex flex-col bg-white border-0 transition-all duration-300 ease-in-out relative',
+                      'shadow-none border-b-4 border-b-[#FF6B35]',
+                      'md:shadow-sm md:hover:shadow-xl md:hover:-translate-y-2 md:border-b-0 md:border-t-4 md:border-t-[#FF6B35]',
+                      isInView ? 'animate-fade-in opacity-100' : 'opacity-0',
+                    )}
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="absolute top-4 right-4 z-10">
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        className="rounded-full bg-[#25D366] text-white hover:bg-[#128C7E]"
+                        onClick={() => handleWhatsApp(advisor)}
+                      >
+                        <MessageCircle className="h-5 w-5" />
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <CardHeader className="text-center p-[24px]">
+                      <Avatar className="h-24 w-24 border-2 border-[#FF6B35] mx-auto shadow-sm mb-4">
+                        <AvatarImage src={avatarUrl} alt={advisor.nome} className="object-cover" />
+                        <AvatarFallback className="text-xl font-bold bg-[#F5F5F5] text-[#333333]">
+                          {advisor.nome.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <h3 className="text-xl font-bold text-[#333333]">{advisor.nome}</h3>
+                      <p className="text-[#FF6B35] font-medium text-sm mt-1">
+                        {advisor.especialidades}
+                      </p>
+                    </CardHeader>
+                    <CardContent className="flex-1 p-[24px] pt-0 space-y-4">
+                      <div className="space-y-3 text-sm">
+                        <div className="flex items-center gap-3 text-[#333333]">
+                          <GraduationCap className="h-4 w-4 shrink-0 text-[#003366]" />
+                          <span>
+                            Formado em{' '}
+                            <strong className="font-semibold">{advisor.formacao_academica}</strong>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[#333333]">
+                          <Briefcase className="h-4 w-4 shrink-0 text-[#003366]" />
+                          <span>
+                            <strong className="font-semibold">
+                              {advisor.experiencia_profissional}
+                            </strong>{' '}
+                            de experiência
+                          </span>
+                        </div>
+                        {certs.length > 0 && (
+                          <div className="flex items-center gap-3 text-[#333333]">
+                            <Award className="h-4 w-4 shrink-0 text-[#003366]" />
+                            <div className="flex flex-wrap gap-2">
+                              {certs.map((cert) => (
+                                <Badge
+                                  key={cert}
+                                  variant="outline"
+                                  className="px-1.5 py-0 h-5 text-[10px] border-[#003366]/20 font-bold bg-[#F5F5F5] text-[#333333]"
+                                >
+                                  {cert}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {habilidades.length > 0 && (
+                        <div className="space-y-2 pt-4 border-t border-[#F5F5F5]">
+                          <p className="text-xs font-bold text-[#333333]/60 uppercase tracking-wider">
+                            Habilidades
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {habilidades.map((skill) => (
+                              <Badge
+                                key={skill}
+                                variant="secondary"
+                                className="bg-[#F5F5F5] text-[#333333] hover:bg-[#E5E5E5] text-xs font-medium border-0 transition-colors duration-300 ease-in-out"
+                              >
+                                {skill}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           )}
 
@@ -250,11 +245,11 @@ export default function Index() {
           {status === 'success' && (
             <div className="mt-[40px] flex justify-center animate-fade-in-slow">
               <Button
-                className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-bold rounded-[8px] px-[32px] py-[12px] h-auto text-base gap-2 transition-all duration-300 ease-in-out hover:scale-105 shadow-md hover:shadow-lg"
-                onClick={handleWhatsApp}
+                className="bg-[#25D366] hover:bg-[#128C7E] text-white font-bold rounded-[8px] px-[32px] py-[12px] h-auto text-base gap-2 transition-all duration-300 ease-in-out hover:scale-105 shadow-md hover:shadow-lg"
+                onClick={() => handleWhatsApp()}
               >
                 <MessageCircle className="h-5 w-5" />
-                Entrar em contato via WhatsApp
+                Falar com Atendimento Geral
               </Button>
             </div>
           )}
