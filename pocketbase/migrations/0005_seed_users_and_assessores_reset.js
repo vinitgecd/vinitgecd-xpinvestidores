@@ -18,10 +18,10 @@ migrate(
 
     // 1. Create users
     const usersData = [
-      { email: 'admin@xp.com', password: 'admin123', role: 'admin', name: 'Admin' },
-      { email: 'joao@xp.com', password: 'joao123', role: 'assessor', name: 'João Silva' },
-      { email: 'carlos@xp.com', password: 'carlos123', role: 'assessor', name: 'Carlos Oliveira' },
-      { email: 'marina@xp.com', password: 'marina123', role: 'assessor', name: 'Marina Santos' },
+      { email: 'admin@xp.com', password: 'Skip@Pass', role: 'admin', name: 'Admin' },
+      { email: 'joao@xp.com', password: 'Skip@Pass', role: 'assessor', name: 'João Silva' },
+      { email: 'carlos@xp.com', password: 'Skip@Pass', role: 'assessor', name: 'Carlos Oliveira' },
+      { email: 'marina@xp.com', password: 'Skip@Pass', role: 'assessor', name: 'Marina Santos' },
     ]
 
     const createdUsers = {}
