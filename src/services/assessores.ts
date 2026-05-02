@@ -24,3 +24,6 @@ export const getAssessorByUserId = (userId: string) =>
   pb.collection('assessores').getFirstListItem<Assessor>(`user_id = "${userId}"`)
 export const updateAssessor = (id: string, data: Partial<Assessor>) =>
   pb.collection('assessores').update<Assessor>(id, data)
+export const createAssessor = (data: Partial<Assessor>) =>
+  pb.collection('assessores').create<Assessor>(data)
+export const deleteAssessor = (id: string) => pb.collection('assessores').delete(id)
