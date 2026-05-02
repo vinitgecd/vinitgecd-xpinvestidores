@@ -147,32 +147,34 @@ export default function Index() {
 
           {/* Loading State */}
           {status === 'loading' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="overflow-hidden shadow-sm border-0">
-                  <CardHeader className="text-center pt-10 pb-4 relative">
-                    <div className="absolute top-0 left-0 w-full h-24 bg-muted animate-pulse" />
-                    <Skeleton className="h-32 w-32 rounded-full mx-auto mb-4 relative z-10 border-4 border-background" />
-                    <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
-                    <Skeleton className="h-4 w-1/2 mx-auto" />
-                  </CardHeader>
-                  <CardContent className="space-y-6 px-6">
-                    <div className="space-y-3">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                    <div className="flex gap-2">
-                      <Skeleton className="h-6 w-16 rounded-full" />
-                      <Skeleton className="h-6 w-20 rounded-full" />
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-6">
-                    <Skeleton className="h-12 w-full rounded-md" />
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="overflow-hidden shadow-sm border-0">
+                    <CardHeader className="text-center pt-10 pb-4 relative">
+                      <div className="absolute top-0 left-0 w-full h-24 bg-muted animate-pulse" />
+                      <Skeleton className="h-32 w-32 rounded-full mx-auto mb-4 relative z-10 border-4 border-background" />
+                      <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
+                      <Skeleton className="h-4 w-1/2 mx-auto" />
+                    </CardHeader>
+                    <CardContent className="space-y-6 px-6 pb-8">
+                      <div className="space-y-3">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                      </div>
+                      <div className="flex gap-2">
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <div className="mt-16 flex justify-center">
+                <Skeleton className="h-14 w-80 rounded-full" />
+              </div>
+            </>
           )}
 
           {/* Error State */}
@@ -239,7 +241,7 @@ export default function Index() {
                     </h3>
                     <p className="text-yellow-600 font-semibold mt-1.5">{advisor.specialty}</p>
                   </CardHeader>
-                  <CardContent className="flex-1 px-8 py-4 space-y-6">
+                  <CardContent className="flex-1 px-8 py-4 pb-8 space-y-6">
                     <div className="space-y-3 text-sm">
                       <div className="flex items-center gap-3 text-zinc-600">
                         <GraduationCap className="h-4 w-4 shrink-0" />
@@ -288,17 +290,21 @@ export default function Index() {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="p-8 pt-4 mt-auto">
-                    <Button
-                      className="w-full bg-[#25D366] hover:bg-[#1DA851] text-white font-semibold gap-2 transition-all duration-300 shadow-md hover:shadow-lg h-12 text-base"
-                      onClick={() => handleWhatsApp(advisor.name)}
-                    >
-                      <MessageCircle className="h-5 w-5" />
-                      Contato via WhatsApp
-                    </Button>
-                  </CardFooter>
                 </Card>
               ))}
+            </div>
+          )}
+
+          {/* Centered CTA */}
+          {status === 'success' && (
+            <div className="mt-16 flex justify-center animate-fade-in-up">
+              <Button
+                className="bg-[#25D366] hover:bg-[#1DA851] text-white font-semibold gap-2 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 h-14 px-8 text-lg rounded-full"
+                onClick={() => handleWhatsApp('a equipe')}
+              >
+                <MessageCircle className="h-6 w-6" />
+                Entrar em contato via WhatsApp
+              </Button>
             </div>
           )}
         </div>
