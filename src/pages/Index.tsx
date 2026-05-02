@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import {
-  ChevronDown,
   MessageCircle,
   AlertCircle,
   RefreshCw,
@@ -9,7 +8,7 @@ import {
   Award,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -68,7 +67,6 @@ export default function Index() {
 
   const loadData = () => {
     setStatus('loading')
-    // Simulate API call for demonstration purposes
     setTimeout(() => {
       setAdvisors(MOCK_ADVISORS)
       setStatus('success')
@@ -79,100 +77,57 @@ export default function Index() {
     loadData()
   }, [])
 
-  const handleWhatsApp = (name: string) => {
-    const text = encodeURIComponent(`Olá, gostaria de falar com ${name} sobre meus investimentos.`)
+  const handleWhatsApp = () => {
+    const text = encodeURIComponent(
+      `Olá, gostaria de falar com um assessor sobre meus investimentos.`,
+    )
     window.open(`https://wa.me/5511999999999?text=${text}`, '_blank')
   }
 
-  const scrollToAssessores = () => {
-    document.getElementById('assessores')?.scrollIntoView({ behavior: 'smooth' })
-  }
-
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full text-[#333333]">
       {/* Hero Section */}
       <section
         id="home"
-        className="relative min-h-[90vh] flex items-center justify-center bg-black text-white overflow-hidden"
+        className="relative flex items-center justify-center bg-gradient-to-br from-[#003366] to-[#0055A4] text-white py-[60px] md:py-[100px] lg:py-[140px] px-[20px] md:px-[40px] lg:px-[60px]"
       >
-        {/* Abstract Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-zinc-950" />
-        <div className="absolute inset-0 bg-[url('https://img.usecurling.com/p/1920/1080?q=abstract%20dark%20finance')] opacity-20 bg-cover bg-center mix-blend-overlay" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="relative z-10 container mx-auto px-4 text-center flex flex-col items-center animate-fade-in-up">
-          <Badge
-            variant="outline"
-            className="mb-6 px-4 py-1 text-sm text-accent border-accent/50 bg-accent/10 hover:bg-accent/20 transition-colors rounded-full"
-          >
-            Assessoria Premium
-          </Badge>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter mb-6">
-            Nossos <span className="text-accent drop-shadow-lg">Assessores</span>
+        <div className="relative z-10 container mx-auto text-center flex flex-col items-center animate-fade-in-slow">
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight mb-6 text-white">
+            Nossos Assessores
           </h1>
-          <p className="text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
+          <p className="text-base md:text-xl text-white/90 max-w-2xl mx-auto mb-10 font-medium leading-relaxed">
             Especialistas dedicados a potencializar seus investimentos com a segurança e expertise
             da XP.
           </p>
-          <Button
-            size="lg"
-            className="bg-accent text-black hover:bg-accent/90 rounded-full px-8 py-6 text-lg font-bold shadow-xl transition-transform hover:scale-105"
-            onClick={scrollToAssessores}
-          >
-            Conheça a Equipe
-          </Button>
-        </div>
-
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer z-10 p-4">
-          <ChevronDown
-            className="h-10 w-10 text-gray-400 hover:text-accent transition-colors"
-            onClick={scrollToAssessores}
-          />
         </div>
       </section>
 
       {/* Advisors Section */}
-      <section id="assessores" className="py-24 bg-zinc-50 min-h-screen relative">
-        <div className="container mx-auto px-4" ref={sectionRef}>
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-tight">
-              Especialistas à Sua Disposição
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Profissionais altamente qualificados e certificados para guiar sua jornada financeira
-              com excelência e personalização.
-            </p>
-          </div>
-
+      <section
+        id="assessores"
+        className="py-[60px] md:py-[80px] lg:py-[100px] bg-[#F5F5F5] px-[20px] md:px-[40px] lg:px-[60px]"
+      >
+        <div className="container mx-auto" ref={sectionRef}>
           {/* Loading State */}
           {status === 'loading' && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3].map((i) => (
                   <Card key={i} className="overflow-hidden shadow-sm border-0">
-                    <CardHeader className="text-center pt-10 pb-4 relative">
-                      <div className="absolute top-0 left-0 w-full h-24 bg-muted animate-pulse" />
-                      <Skeleton className="h-32 w-32 rounded-full mx-auto mb-4 relative z-10 border-4 border-background" />
+                    <CardHeader className="text-center p-[24px] relative">
+                      <Skeleton className="h-24 w-24 rounded-full mx-auto mb-4 relative z-10" />
                       <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
                       <Skeleton className="h-4 w-1/2 mx-auto" />
                     </CardHeader>
-                    <CardContent className="space-y-6 px-6 pb-8">
+                    <CardContent className="space-y-6 p-[24px] pt-0">
                       <div className="space-y-3">
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-3/4" />
                       </div>
-                      <div className="flex gap-2">
-                        <Skeleton className="h-6 w-16 rounded-full" />
-                        <Skeleton className="h-6 w-20 rounded-full" />
-                      </div>
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-              <div className="mt-16 flex justify-center">
-                <Skeleton className="h-14 w-80 rounded-full" />
               </div>
             </>
           )}
@@ -184,14 +139,10 @@ export default function Index() {
                 <AlertCircle className="h-12 w-12" />
               </div>
               <h3 className="text-2xl font-semibold mb-2">Ocorreu um erro ao carregar os dados.</h3>
-              <p className="text-muted-foreground mb-8">
+              <p className="text-[#333333]/80 mb-8">
                 Não foi possível conectar ao servidor no momento. Tente novamente mais tarde.
               </p>
-              <Button
-                onClick={loadData}
-                variant="outline"
-                className="gap-2 rounded-full px-6 border-gray-300"
-              >
+              <Button onClick={loadData} variant="outline" className="gap-2 rounded-lg px-6">
                 <RefreshCw className="h-4 w-4" />
                 Tentar novamente
               </Button>
@@ -201,11 +152,13 @@ export default function Index() {
           {/* Empty State */}
           {status === 'empty' && (
             <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
-              <div className="bg-muted p-6 rounded-full mb-6">
-                <Briefcase className="h-12 w-12 text-muted-foreground" />
+              <div className="bg-white p-6 rounded-full mb-6 shadow-sm">
+                <Briefcase className="h-12 w-12 text-[#333333]" />
               </div>
-              <h3 className="text-2xl font-semibold mb-2">Nenhum assessor disponível</h3>
-              <p className="text-muted-foreground max-w-md">
+              <h3 className="text-2xl font-semibold mb-2 text-[#333333]">
+                Nenhum assessor disponível
+              </h3>
+              <p className="text-[#333333]/80 max-w-md">
                 No momento, não temos assessores listados. Por favor, volte mais tarde ou entre em
                 contato diretamente pelo nosso canal de atendimento.
               </p>
@@ -219,52 +172,50 @@ export default function Index() {
                 <Card
                   key={advisor.id}
                   className={cn(
-                    'flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl border-border/40 bg-white',
-                    isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12',
+                    'flex flex-col bg-white border-0 transition-all duration-300 ease-in-out',
+                    'shadow-none border-b-4 border-b-[#FF6B35]',
+                    'md:shadow-sm md:hover:shadow-xl md:hover:-translate-y-2 md:border-b-0 md:border-t-4 md:border-t-[#FF6B35]',
+                    isInView ? 'animate-fade-in opacity-100' : 'opacity-0',
                   )}
-                  style={{ transitionDelay: `${index * 150}ms` }}
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <CardHeader className="text-center pt-8 pb-4 relative">
-                    <div className="absolute top-0 left-0 w-full h-28 bg-gradient-to-b from-black to-zinc-900" />
-                    <Avatar className="h-32 w-32 border-4 border-white mx-auto shadow-md relative z-10 mb-5">
+                  <CardHeader className="text-center p-[24px]">
+                    <Avatar className="h-24 w-24 border-2 border-[#FF6B35] mx-auto shadow-sm mb-4">
                       <AvatarImage
                         src={advisor.image}
                         alt={advisor.name}
                         className="object-cover"
                       />
-                      <AvatarFallback className="text-2xl font-bold bg-zinc-100 text-black">
+                      <AvatarFallback className="text-xl font-bold bg-[#F5F5F5] text-[#333333]">
                         {advisor.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <h3 className="text-2xl font-bold tracking-tight text-zinc-900">
-                      {advisor.name}
-                    </h3>
-                    <p className="text-yellow-600 font-semibold mt-1.5">{advisor.specialty}</p>
+                    <h3 className="text-xl font-bold text-[#333333]">{advisor.name}</h3>
+                    <p className="text-[#FF6B35] font-medium text-sm mt-1">{advisor.specialty}</p>
                   </CardHeader>
-                  <CardContent className="flex-1 px-8 py-4 pb-8 space-y-6">
+                  <CardContent className="flex-1 p-[24px] pt-0 space-y-4">
                     <div className="space-y-3 text-sm">
-                      <div className="flex items-center gap-3 text-zinc-600">
-                        <GraduationCap className="h-4 w-4 shrink-0" />
+                      <div className="flex items-center gap-3 text-[#333333]">
+                        <GraduationCap className="h-4 w-4 shrink-0 text-[#003366]" />
                         <span>
-                          Formado em <strong className="text-zinc-900">{advisor.education}</strong>
+                          Formado em <strong className="font-semibold">{advisor.education}</strong>
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-zinc-600">
-                        <Briefcase className="h-4 w-4 shrink-0" />
+                      <div className="flex items-center gap-3 text-[#333333]">
+                        <Briefcase className="h-4 w-4 shrink-0 text-[#003366]" />
                         <span>
-                          <strong className="text-zinc-900">{advisor.experience}</strong> de
+                          <strong className="font-semibold">{advisor.experience}</strong> de
                           experiência
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-zinc-600">
-                        <Award className="h-4 w-4 shrink-0" />
-                        <div className="flex gap-2">
-                          Certificações:
+                      <div className="flex items-center gap-3 text-[#333333]">
+                        <Award className="h-4 w-4 shrink-0 text-[#003366]" />
+                        <div className="flex flex-wrap gap-2">
                           {advisor.certifications.map((cert) => (
                             <Badge
                               key={cert}
                               variant="outline"
-                              className="px-1.5 py-0 h-5 text-[10px] border-zinc-300 font-bold bg-zinc-50 text-zinc-800"
+                              className="px-1.5 py-0 h-5 text-[10px] border-[#003366]/20 font-bold bg-[#F5F5F5] text-[#333333]"
                             >
                               {cert}
                             </Badge>
@@ -273,8 +224,8 @@ export default function Index() {
                       </div>
                     </div>
 
-                    <div className="space-y-3 pt-2">
-                      <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                    <div className="space-y-2 pt-4 border-t border-[#F5F5F5]">
+                      <p className="text-xs font-bold text-[#333333]/60 uppercase tracking-wider">
                         Especialidades
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -282,7 +233,7 @@ export default function Index() {
                           <Badge
                             key={skill}
                             variant="secondary"
-                            className="bg-zinc-100 text-zinc-700 hover:bg-zinc-200 text-xs font-medium border-0"
+                            className="bg-[#F5F5F5] text-[#333333] hover:bg-[#E5E5E5] text-xs font-medium border-0 transition-colors duration-300 ease-in-out"
                           >
                             {skill}
                           </Badge>
@@ -297,12 +248,12 @@ export default function Index() {
 
           {/* Centered CTA */}
           {status === 'success' && (
-            <div className="mt-16 flex justify-center animate-fade-in-up">
+            <div className="mt-[40px] flex justify-center animate-fade-in-slow">
               <Button
-                className="bg-[#25D366] hover:bg-[#1DA851] text-white font-semibold gap-2 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 h-14 px-8 text-lg rounded-full"
-                onClick={() => handleWhatsApp('a equipe')}
+                className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-bold rounded-[8px] px-[32px] py-[12px] h-auto text-base gap-2 transition-all duration-300 ease-in-out hover:scale-105 shadow-md hover:shadow-lg"
+                onClick={handleWhatsApp}
               >
-                <MessageCircle className="h-6 w-6" />
+                <MessageCircle className="h-5 w-5" />
                 Entrar em contato via WhatsApp
               </Button>
             </div>
