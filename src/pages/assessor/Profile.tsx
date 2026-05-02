@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { getAssessorByUserId, updateAssessor, Assessor } from '@/services/assessores'
+import pb from '@/lib/pocketbase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ShieldAlert, Save } from 'lucide-react'
+import { ShieldAlert, Save, Upload, Trash2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { extractFieldErrors } from '@/lib/pocketbase/errors'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const fields = [
   { id: 'nome', label: 'Nome Completo', req: true },
@@ -31,6 +33,10 @@ export default function AssessorProfile() {
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     if (user?.role === 'assessor') {
       getAssessorByUserId(user.id)
@@ -41,11 +47,38 @@ export default function AssessorProfile() {
             {},
           )
           setFormData(initial)
+          if (data.foto_perfil) {
+            setPreviewUrl(pb.files.getURL(data, data.foto_perfil))
+          }
         })
         .catch(() => toast({ variant: 'destructive', title: 'Erro ao carregar perfil' }))
         .finally(() => setLoading(false))
     }
   }, [user, toast])
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          variant: 'destructive',
+          title: 'Erro',
+          description: 'A imagem deve ter no máximo 5MB.',
+        })
+        return
+      }
+      setSelectedFile(file)
+      setPreviewUrl(URL.createObjectURL(file))
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null)
+    setPreviewUrl(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,8 +86,26 @@ export default function AssessorProfile() {
     setSaving(true)
     setErrors({})
     try {
-      const updated = await updateAssessor(assessor.id, formData)
+      const payload = new FormData()
+
+      Object.keys(formData).forEach((key) => {
+        payload.append(key, formData[key])
+      })
+
+      if (selectedFile) {
+        payload.append('foto_perfil', selectedFile)
+      } else if (!previewUrl && assessor.foto_perfil) {
+        payload.append('foto_perfil', '')
+      }
+
+      const updated = await updateAssessor(assessor.id, payload)
       setAssessor(updated)
+      setSelectedFile(null)
+      if (updated.foto_perfil) {
+        setPreviewUrl(pb.files.getURL(updated, updated.foto_perfil))
+      } else {
+        setPreviewUrl(null)
+      }
       toast({ title: 'Sucesso', description: 'Perfil atualizado com sucesso!' })
     } catch (err: any) {
       const fieldErrs = extractFieldErrors(err)
@@ -95,10 +146,52 @@ export default function AssessorProfile() {
         <Card className="border-t-4 border-t-[#FF6B35]">
           <CardHeader>
             <CardTitle>Informações Públicas</CardTitle>
-            <CardDescription>Estes dados serão visíveis para todos.</CardDescription>
+            <CardDescription>Estes dados serão visíveis para todos os clientes.</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2 flex flex-col gap-4 mb-4">
+                <Label>Foto de Perfil</Label>
+                <div className="flex items-center gap-6">
+                  <Avatar className="h-24 w-24 border-2 border-gray-100">
+                    <AvatarImage src={previewUrl || ''} className="object-cover" />
+                    <AvatarFallback className="text-3xl bg-primary/10 text-primary font-medium">
+                      {formData.nome ? formData.nome.charAt(0).toUpperCase() : 'A'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="foto_perfil"
+                      className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Escolher Foto
+                    </Label>
+                    <Input
+                      id="foto_perfil"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={handleFileChange}
+                      ref={fileInputRef}
+                    />
+                    {previewUrl && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRemoveImage}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Remover
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                {errors.foto_perfil && <p className="text-sm text-red-500">{errors.foto_perfil}</p>}
+              </div>
+
               {fields.map((f) => (
                 <div
                   key={f.id}
