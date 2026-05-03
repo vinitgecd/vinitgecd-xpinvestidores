@@ -9,6 +9,8 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import AdminDashboard from './pages/admin/Dashboard'
 import AssessorProfile from './pages/assessor/Profile'
+import NovoCliente from './pages/clientes/NovoCliente'
+import ClientesList from './pages/clientes/ClientesList'
 import { AuthProvider, useAuth } from './hooks/use-auth'
 
 const DashboardRouter = () => {
@@ -35,6 +37,8 @@ const App = () => (
             <Route path="/dashboard" element={<DashboardRouter />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/assessor/profile" element={<AssessorProfile />} />
+            <Route path="/novo-cliente" element={<NovoCliente />} />
+            <Route path="/clientes" element={<ClientesList />} />
             {/* ADD ALL CUSTOM ROUTES MUST BE ADDED HERE */}
           </Route>
           <Route path="*" element={<NotFound />} />
