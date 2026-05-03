@@ -156,6 +156,7 @@ export default function Index() {
                       <AdvisorWhatsAppButton
                         advisorId={advisor.user_id}
                         advisorName={advisor.nome}
+                        advisorPhone={advisor.whatsapp}
                       />
                     </div>
                     <CardHeader className="text-center p-[24px]">
@@ -235,8 +236,8 @@ export default function Index() {
           {status === 'success' && (
             <div className="mt-[40px] flex justify-center animate-fade-in-slow">
               <WhatsAppButton
-                className="bg-[#25D366] hover:bg-[#128C7E] font-bold rounded-[8px] px-[32px] py-[12px] h-auto text-base gap-2 transition-all duration-300 ease-in-out hover:scale-105 shadow-md hover:shadow-lg text-white"
-                message="Olá, gostaria de falar com um assessor sobre meus investimentos."
+                className="font-bold rounded-[8px] px-[32px] py-[12px] h-auto text-base gap-2 transition-all duration-300 ease-in-out hover:scale-105 shadow-md hover:shadow-lg text-white"
+                message="Olá! Gostaria de falar com um atendente sobre meus investimentos."
                 label="Falar com Atendimento Geral"
               />
             </div>

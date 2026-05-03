@@ -72,7 +72,11 @@ export function Footer() {
             <span>{address}</span>
           </div>
           <div className="flex items-center">
-            <WhatsAppButton variant="link" className="text-white hover:text-[#FF6B35]" />
+            <WhatsAppButton
+              variant="link"
+              label="WhatsApp"
+              className="text-white hover:text-[#FF6B35]"
+            />
           </div>
         </div>
 

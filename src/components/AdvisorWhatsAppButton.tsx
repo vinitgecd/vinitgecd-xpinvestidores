@@ -1,72 +1,33 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { MessageCircle, Loader2 } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { getAdvisorWhatsApp } from '@/services/contatos'
 import { redirectToWhatsApp, unformatPhone } from '@/utils/whatsapp'
 import { toast } from 'sonner'
 
 interface AdvisorWhatsAppButtonProps {
   advisorId: string
+  advisorPhone?: string
   advisorName: string
 }
 
-export function AdvisorWhatsAppButton({ advisorId, advisorName }: AdvisorWhatsAppButtonProps) {
-  const [phone, setPhone] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let isMounted = true
-    const fetchPhone = async () => {
-      setLoading(true)
-      try {
-        const p = await getAdvisorWhatsApp(advisorId)
-        if (isMounted) {
-          setPhone(p)
-          setError(null)
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          setError(err.message || 'WhatsApp não configurado para este assessor')
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
-      }
-    }
-    fetchPhone()
-    return () => {
-      isMounted = false
-    }
-  }, [advisorId])
-
+export function AdvisorWhatsAppButton({
+  advisorId,
+  advisorPhone,
+  advisorName,
+}: AdvisorWhatsAppButtonProps) {
   const handleClick = useCallback(() => {
-    if (phone) {
+    if (advisorPhone) {
       try {
-        const rawDigits = unformatPhone(phone)
+        const rawDigits = unformatPhone(advisorPhone)
         redirectToWhatsApp(rawDigits, `Olá! Gostaria de falar com ${advisorName}`)
       } catch (e: any) {
-        toast.error('Número de WhatsApp inválido')
+        toast.error('Número inválido')
       }
     }
-  }, [phone, advisorName])
+  }, [advisorPhone, advisorName])
 
-  if (loading) {
-    return (
-      <Button
-        size="icon"
-        variant="secondary"
-        className="rounded-full bg-[#25D366] text-white hover:bg-[#128C7E] opacity-50 cursor-not-allowed"
-        disabled
-      >
-        <Loader2 className="h-5 w-5 animate-spin" />
-      </Button>
-    )
-  }
-
-  if (error || !phone) {
+  if (!advisorPhone) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
@@ -82,7 +43,7 @@ export function AdvisorWhatsAppButton({ advisorId, advisorName }: AdvisorWhatsAp
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{error || 'WhatsApp não configurado para este assessor'}</p>
+          <p>WhatsApp não configurado para este assessor</p>
         </TooltipContent>
       </Tooltip>
     )

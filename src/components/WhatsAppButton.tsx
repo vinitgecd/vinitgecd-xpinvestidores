@@ -12,6 +12,7 @@ interface WhatsAppButtonProps {
   message?: string
   className?: string
   label?: string
+  tooltip?: string
 }
 
 export function WhatsAppButton({
@@ -19,6 +20,7 @@ export function WhatsAppButton({
   message,
   className,
   label,
+  tooltip,
 }: WhatsAppButtonProps) {
   const { loading, getWhatsAppUrl, hasWhatsApp } = useContatos()
 
@@ -29,6 +31,8 @@ export function WhatsAppButton({
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)
+      } else {
+        toast.error('Erro ao conectar')
       }
     }
   }, [getWhatsAppUrl, message])
@@ -46,9 +50,9 @@ export function WhatsAppButton({
           onClick={handleClick}
         >
           {loading ? (
-            <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
+            <Loader2 className="h-5 w-5 text-[#25D366] animate-spin" />
           ) : (
-            <MessageCircle className="h-5 w-5 text-green-500" />
+            <MessageCircle className="h-5 w-5 text-[#25D366]" />
           )}
         </Button>
       )
@@ -58,7 +62,7 @@ export function WhatsAppButton({
       return (
         <button
           className={cn(
-            'hover:text-green-500 transition-colors flex items-center gap-2 disabled:opacity-50',
+            'hover:text-[#25D366] transition-colors flex items-center gap-2 disabled:opacity-50',
             className,
           )}
           disabled={disabled}
@@ -69,14 +73,14 @@ export function WhatsAppButton({
           ) : (
             <MessageCircle className="h-4 w-4" />
           )}
-          <span>WhatsApp</span>
+          <span>{label || 'WhatsApp'}</span>
         </button>
       )
     }
 
     return (
       <Button
-        className={cn('bg-green-600 hover:bg-green-700 text-white', className)}
+        className={cn('bg-[#25D366] hover:bg-[#128C7E] text-white', className)}
         disabled={disabled}
         onClick={handleClick}
       >
@@ -96,7 +100,22 @@ export function WhatsAppButton({
         <TooltipTrigger asChild>
           <div className="inline-block cursor-not-allowed">{renderContent()}</div>
         </TooltipTrigger>
-        <TooltipContent>WhatsApp não configurado</TooltipContent>
+        <TooltipContent>
+          <p>Número de WhatsApp não configurado</p>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  if (tooltip && !disabled) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="inline-block">{renderContent()}</div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{tooltip}</p>
+        </TooltipContent>
       </Tooltip>
     )
   }

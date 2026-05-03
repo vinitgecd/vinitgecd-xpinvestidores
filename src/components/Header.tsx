@@ -92,7 +92,7 @@ export function Header() {
             </Link>
           )}
           <div className="border-l pl-4 ml-2">
-            <WhatsAppButton variant="icon" />
+            <WhatsAppButton variant="icon" tooltip="Falar com atendimento" />
           </div>
         </nav>
       </div>
