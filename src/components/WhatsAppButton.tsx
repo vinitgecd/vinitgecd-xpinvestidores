@@ -25,6 +25,10 @@ export function WhatsAppButton({
   const { loading, getWhatsAppUrl, hasWhatsApp } = useContatos()
 
   const handleClick = useCallback(() => {
+    if (!hasWhatsApp) {
+      toast.error('Número de WhatsApp não configurado')
+      return
+    }
     try {
       const phone = getWhatsAppUrl()
       redirectToWhatsApp(phone, message)
@@ -35,7 +39,7 @@ export function WhatsAppButton({
         toast.error('Erro ao conectar')
       }
     }
-  }, [getWhatsAppUrl, message])
+  }, [getWhatsAppUrl, message, hasWhatsApp])
 
   const disabled = !hasWhatsApp || loading
 
