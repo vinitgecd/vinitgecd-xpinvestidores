@@ -99,6 +99,13 @@ export default function AssessorProfile() {
       }
 
       const updated = await updateAssessor(assessor.id, payload)
+      if (formData.whatsapp !== undefined) {
+        try {
+          await pb.collection('users').update(assessor.user_id, { whatsapp: formData.whatsapp })
+        } catch (e) {
+          console.error('Failed to update user whatsapp', e)
+        }
+      }
       setAssessor(updated)
       setSelectedFile(null)
       if (updated.foto_perfil) {

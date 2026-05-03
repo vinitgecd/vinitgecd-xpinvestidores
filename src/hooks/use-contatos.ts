@@ -34,7 +34,7 @@ export function useContatos() {
   const getWhatsAppUrl = useCallback(() => {
     const whatsappContato = contatos.find((c) => c.tipo === 'whatsapp' && c.ativo)
     if (!whatsappContato) {
-      throw new Error('Numero de WhatsApp nao configurado')
+      throw new Error('WhatsApp não configurado')
     }
     return whatsappContato.valor
   }, [contatos])

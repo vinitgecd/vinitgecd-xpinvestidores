@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-03T16:31:00.173Z",
+  "generatedAt": "2026-05-03T17:06:01.642Z",
   "collections": [
     {
       "name": "users",
@@ -44,6 +44,12 @@
           "required": true,
           "system": false,
           "selectValues": ["admin", "assessor"]
+        },
+        {
+          "name": "whatsapp",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

@@ -16,6 +16,8 @@ import { useInView } from '@/hooks/use-in-view'
 import { cn } from '@/lib/utils'
 import { getAssessores, Assessor } from '@/services/assessores'
 import pb from '@/lib/pocketbase/client'
+import { AdvisorWhatsAppButton } from '@/components/AdvisorWhatsAppButton'
+import { WhatsAppButton } from '@/components/WhatsAppButton'
 
 export default function Index() {
   const [status, setStatus] = useState<'loading' | 'error' | 'empty' | 'success'>('loading')
@@ -38,14 +40,6 @@ export default function Index() {
   useEffect(() => {
     loadData()
   }, [])
-
-  const handleWhatsApp = (assessor?: Assessor) => {
-    const phone = assessor?.whatsapp || '5511999999999'
-    const text = encodeURIComponent(
-      `Olá, gostaria de falar com um assessor sobre meus investimentos.`,
-    )
-    window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
-  }
 
   const parseList = (str: string) =>
     str
@@ -159,14 +153,10 @@ export default function Index() {
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="absolute top-4 right-4 z-10">
-                      <Button
-                        size="icon"
-                        variant="secondary"
-                        className="rounded-full bg-[#25D366] text-white hover:bg-[#128C7E]"
-                        onClick={() => handleWhatsApp(advisor)}
-                      >
-                        <MessageCircle className="h-5 w-5" />
-                      </Button>
+                      <AdvisorWhatsAppButton
+                        advisorId={advisor.user_id}
+                        advisorName={advisor.nome}
+                      />
                     </div>
                     <CardHeader className="text-center p-[24px]">
                       <Avatar className="h-24 w-24 border-2 border-[#FF6B35] mx-auto shadow-sm mb-4">
@@ -244,13 +234,11 @@ export default function Index() {
           {/* Centered CTA */}
           {status === 'success' && (
             <div className="mt-[40px] flex justify-center animate-fade-in-slow">
-              <Button
-                className="bg-[#25D366] hover:bg-[#128C7E] text-white font-bold rounded-[8px] px-[32px] py-[12px] h-auto text-base gap-2 transition-all duration-300 ease-in-out hover:scale-105 shadow-md hover:shadow-lg"
-                onClick={() => handleWhatsApp()}
-              >
-                <MessageCircle className="h-5 w-5" />
-                Falar com Atendimento Geral
-              </Button>
+              <WhatsAppButton
+                className="bg-[#25D366] hover:bg-[#128C7E] font-bold rounded-[8px] px-[32px] py-[12px] h-auto text-base gap-2 transition-all duration-300 ease-in-out hover:scale-105 shadow-md hover:shadow-lg text-white"
+                message="Olá, gostaria de falar com um assessor sobre meus investimentos."
+                label="Falar com Atendimento Geral"
+              />
             </div>
           )}
         </div>

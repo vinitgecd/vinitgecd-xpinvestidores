@@ -11,9 +11,15 @@ interface WhatsAppButtonProps {
   variant?: 'button' | 'icon' | 'link'
   message?: string
   className?: string
+  label?: string
 }
 
-export function WhatsAppButton({ variant = 'button', message, className }: WhatsAppButtonProps) {
+export function WhatsAppButton({
+  variant = 'button',
+  message,
+  className,
+  label,
+}: WhatsAppButtonProps) {
   const { loading, getWhatsAppUrl, hasWhatsApp } = useContatos()
 
   const handleClick = useCallback(() => {
@@ -79,7 +85,7 @@ export function WhatsAppButton({ variant = 'button', message, className }: Whats
         ) : (
           <MessageCircle className="mr-2 h-4 w-4" />
         )}
-        Falar no WhatsApp
+        {label || 'Falar no WhatsApp'}
       </Button>
     )
   }
@@ -90,7 +96,7 @@ export function WhatsAppButton({ variant = 'button', message, className }: Whats
         <TooltipTrigger asChild>
           <div className="inline-block cursor-not-allowed">{renderContent()}</div>
         </TooltipTrigger>
-        <TooltipContent>Numero de WhatsApp nao configurado</TooltipContent>
+        <TooltipContent>WhatsApp não configurado</TooltipContent>
       </Tooltip>
     )
   }

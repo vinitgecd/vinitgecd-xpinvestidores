@@ -25,3 +25,15 @@ export const createContato = (data: Partial<Contato>) =>
 export const updateContato = (id: string, data: Partial<Contato>) =>
   pb.collection('contatos').update<Contato>(id, data)
 export const deleteContato = (id: string) => pb.collection('contatos').delete(id)
+
+export const getAdvisorWhatsApp = async (advisorId: string): Promise<string> => {
+  try {
+    const user = await pb.collection('users').getOne(advisorId)
+    if (!user.whatsapp) {
+      throw new Error('WhatsApp não configurado para este assessor')
+    }
+    return user.whatsapp
+  } catch (error) {
+    throw new Error('WhatsApp não configurado para este assessor')
+  }
+}

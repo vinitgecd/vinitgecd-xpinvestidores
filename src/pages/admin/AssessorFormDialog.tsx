@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { createUser } from '@/services/users'
 import { createAssessor, updateAssessor, Assessor } from '@/services/assessores'
+import pb from '@/lib/pocketbase/client'
 import { useToast } from '@/hooks/use-toast'
 import { extractFieldErrors } from '@/lib/pocketbase/errors'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -74,9 +75,25 @@ export function AssessorFormDialog({
 
       if (assessor) {
         await updateAssessor(assessor.id, dataToSave)
+        if (dataToSave.whatsapp !== undefined) {
+          try {
+            await pb.collection('users').update(assessor.user_id, { whatsapp: dataToSave.whatsapp })
+          } catch (e) {
+            console.error('Failed to update user whatsapp', e)
+          }
+        }
         toast({ title: 'Assessor atualizado!' })
       } else {
-        await createAssessor(dataToSave)
+        const newAssessor = await createAssessor(dataToSave)
+        if (dataToSave.whatsapp !== undefined && newAssessor.user_id) {
+          try {
+            await pb
+              .collection('users')
+              .update(newAssessor.user_id, { whatsapp: dataToSave.whatsapp })
+          } catch (e) {
+            console.error('Failed to update user whatsapp', e)
+          }
+        }
         toast({ title: 'Assessor criado!' })
       }
       onSuccess()
