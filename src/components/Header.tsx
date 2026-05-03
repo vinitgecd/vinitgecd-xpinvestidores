@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WhatsAppButton } from '@/components/WhatsAppButton'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -52,6 +53,12 @@ export function Header() {
                   >
                     Configurações
                   </Link>
+                  <Link
+                    to="/contatos"
+                    className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Contatos
+                  </Link>
                 </>
               ) : (
                 <>
@@ -84,6 +91,9 @@ export function Header() {
               <Button size="sm">Entrar</Button>
             </Link>
           )}
+          <div className="border-l pl-4 ml-2">
+            <WhatsAppButton variant="icon" />
+          </div>
         </nav>
       </div>
     </header>

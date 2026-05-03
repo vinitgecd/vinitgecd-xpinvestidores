@@ -1,6 +1,7 @@
 import { Mail, Phone, MapPin, Linkedin, Instagram, MessageCircle } from 'lucide-react'
 import { useSettings } from '@/hooks/use-settings'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WhatsAppButton } from '@/components/WhatsAppButton'
 
 export function Footer() {
   const { getValue, loading } = useSettings()
@@ -50,7 +51,7 @@ export function Footer() {
           e expertise que você confia.
         </p>
 
-        <div className="flex flex-col md:flex-row gap-8 md:gap-16 mb-8 text-sm">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-16 mb-8 text-sm items-center justify-center">
           <div className="flex items-center space-x-2">
             <Phone className="h-5 w-5 text-[#FF6B35]" />
             <a
@@ -69,6 +70,9 @@ export function Footer() {
           <div className="flex items-center space-x-2 text-left">
             <MapPin className="h-5 w-5 flex-shrink-0 text-[#FF6B35]" />
             <span>{address}</span>
+          </div>
+          <div className="flex items-center">
+            <WhatsAppButton variant="link" className="text-white hover:text-[#FF6B35]" />
           </div>
         </div>
 

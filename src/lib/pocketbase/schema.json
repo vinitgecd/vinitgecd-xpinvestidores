@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-03T15:47:24.404Z",
+  "generatedAt": "2026-05-03T16:17:38.930Z",
   "collections": [
     {
       "name": "users",
@@ -315,6 +315,63 @@
       "indexes": [
         "CREATE INDEX idx_pwd_reset_code ON password_reset_tokens (reset_code)",
         "CREATE INDEX idx_pwd_reset_user ON password_reset_tokens (user_id)"
+      ]
+    },
+    {
+      "name": "contatos",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != '' && @request.auth.role = 'admin'",
+        "update": "@request.auth.id != '' && @request.auth.role = 'admin'",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "tipo",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["whatsapp", "email", "telefone"]
+        },
+        {
+          "name": "valor",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_contatos_tipo ON contatos (tipo)",
+        "CREATE INDEX idx_contatos_ativo ON contatos (ativo)",
+        "CREATE INDEX idx_contatos_updated ON contatos (updated DESC)"
       ]
     }
   ]
