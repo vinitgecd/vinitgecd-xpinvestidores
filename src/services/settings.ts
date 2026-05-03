@@ -17,6 +17,13 @@ export const getSiteSettings = async (): Promise<SiteSetting[]> => {
 }
 
 export const updateSettingByKey = async (key: string, value: any, updatedBy: string) => {
+  if (key === 'header_whatsapp_number') {
+    const digits = String(value || '').replace(/\D/g, '')
+    if (digits.length !== 11) {
+      throw new Error('Número de WhatsApp inválido')
+    }
+  }
+
   try {
     const record = await pb.collection('site_settings').getFirstListItem(`setting_key="${key}"`)
     return await pb.collection('site_settings').update(record.id, {

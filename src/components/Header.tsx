@@ -3,7 +3,9 @@ import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/hooks/use-settings'
 import { Skeleton } from '@/components/ui/skeleton'
-import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { MessageCircle } from 'lucide-react'
+import { redirectToWhatsApp } from '@/utils/whatsapp'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -17,6 +19,14 @@ export function Header() {
 
   const logoUrl = getFileUrl('header_logo')
   const companyName = getValue('header_company_name', 'XP Investimentos')
+  const whatsappNumber = getValue('header_whatsapp_number', '')
+  const whatsappIcon = getValue('header_whatsapp_icon', true)
+
+  const handleWhatsAppClick = () => {
+    if (whatsappNumber) {
+      redirectToWhatsApp(whatsappNumber, 'Olá! Gostaria de falar com um atendente.')
+    }
+  }
 
   return (
     <header className="w-full border-b bg-background sticky top-0 z-50">
@@ -91,13 +101,45 @@ export function Header() {
               <Button size="sm">Entrar</Button>
             </Link>
           )}
-          <div className="border-l pl-4 ml-2">
-            <WhatsAppButton
-              variant="icon"
-              tooltip="Falar com atendimento"
-              message="Olá! Gostaria de falar com um atendente."
-            />
-          </div>
+          {whatsappIcon && (
+            <div className="border-l pl-4 ml-2">
+              {!whatsappNumber ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="inline-block cursor-not-allowed">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full opacity-50"
+                        disabled
+                      >
+                        <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Número de WhatsApp não configurado</p>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full"
+                      onClick={handleWhatsAppClick}
+                    >
+                      <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Falar com atendimento</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          )}
         </nav>
       </div>
     </header>

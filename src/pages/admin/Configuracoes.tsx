@@ -7,6 +7,7 @@ import { Plus, Trash2, Image as ImageIcon, UploadCloud } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 
 import { useSettings } from '@/hooks/use-settings'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useAuth } from '@/hooks/use-auth'
 import { updateSettingByKey, updateSettingFileByKey } from '@/services/settings'
 
@@ -36,6 +37,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 // Validation Schemas
 const headerSchema = z.object({
   companyName: z.string().min(1, 'Obrigatório').max(100, 'Máximo 100 caracteres'),
+  whatsappNumber: z
+    .string()
+    .min(1, 'Obrigatório')
+    .refine((val) => {
+      const digits = val.replace(/\D/g, '')
+      return digits.length === 11
+    }, 'Número de WhatsApp inválido'),
+  whatsappIcon: z.boolean().default(true),
 })
 
 const footerSchema = z.object({
@@ -52,7 +61,7 @@ const footerSchema = z.object({
 })
 
 export default function Configuracoes() {
-  const { getValue, getFileUrl, loading } = useSettings()
+  const { getValue, getFileUrl, loading, updateSetting } = useSettings()
   const { user, loading: authLoading } = useAuth()
 
   if (authLoading || loading) {
@@ -87,7 +96,10 @@ export default function Configuracoes() {
           <HeaderSettings
             companyName={getValue('header_company_name', '')}
             logoUrl={getFileUrl('header_logo')}
+            whatsappNumber={getValue('header_whatsapp_number', '')}
+            whatsappIcon={getValue('header_whatsapp_icon', true)}
             userId={user?.id || ''}
+            updateSetting={updateSetting}
           />
         </TabsContent>
 
@@ -111,22 +123,32 @@ export default function Configuracoes() {
 function HeaderSettings({
   companyName,
   logoUrl,
+  whatsappNumber,
+  whatsappIcon,
   userId,
+  updateSetting,
 }: {
   companyName: string
   logoUrl: string | null
+  whatsappNumber: string
+  whatsappIcon: boolean
   userId: string
+  updateSetting: (key: string, value: any, updatedBy: string) => Promise<void>
 }) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof headerSchema>>({
     resolver: zodResolver(headerSchema),
-    defaultValues: { companyName },
+    defaultValues: { companyName, whatsappNumber, whatsappIcon },
   })
 
   const watchName = form.watch('companyName')
+  const watchPhone = form.watch('whatsappNumber')
+  const watchIcon = form.watch('whatsappIcon')
   const lastSavedName = useRef(companyName)
+  const lastSavedPhone = useRef(whatsappNumber)
+  const lastSavedIcon = useRef(whatsappIcon)
 
   useEffect(() => {
     if (watchName === lastSavedName.current) return
@@ -135,7 +157,7 @@ function HeaderSettings({
       if (isValid) {
         lastSavedName.current = watchName
         try {
-          await updateSettingByKey('header_company_name', watchName, userId)
+          await updateSetting('header_company_name', watchName, userId)
           toast.success('Nome da empresa atualizado com sucesso!')
         } catch {
           toast.error('Erro ao atualizar nome da empresa.')
@@ -143,7 +165,52 @@ function HeaderSettings({
       }
     }, 500)
     return () => clearTimeout(timer)
-  }, [watchName, form, userId])
+  }, [watchName, form, userId, updateSetting])
+
+  useEffect(() => {
+    if (watchPhone === lastSavedPhone.current) return
+    const timer = setTimeout(async () => {
+      const isValid = await form.trigger('whatsappNumber')
+      if (isValid) {
+        lastSavedPhone.current = watchPhone
+        try {
+          await updateSetting('header_whatsapp_number', watchPhone, userId)
+          toast.success('Número de WhatsApp atualizado com sucesso!')
+        } catch {
+          toast.error('Não foi possível atualizar o WhatsApp')
+        }
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [watchPhone, form, userId, updateSetting])
+
+  useEffect(() => {
+    if (watchIcon === lastSavedIcon.current) return
+    const timer = setTimeout(async () => {
+      const isValid = await form.trigger('whatsappIcon')
+      if (isValid) {
+        lastSavedIcon.current = watchIcon
+        try {
+          await updateSetting('header_whatsapp_icon', watchIcon, userId)
+          toast.success('Ícone WhatsApp atualizado com sucesso!')
+        } catch {
+          toast.error('Não foi possível atualizar o WhatsApp')
+        }
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [watchIcon, form, userId, updateSetting])
+
+  const handlePhoneChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>, onChange: (v: string) => void) => {
+      let value = e.target.value.replace(/\D/g, '')
+      if (value.length > 11) value = value.slice(0, 11)
+      if (value.length > 2) value = `(${value.slice(0, 2)}) ${value.slice(2)}`
+      if (value.length > 10) value = `${value.slice(0, 10)}-${value.slice(10)}`
+      onChange(value)
+    },
+    [],
+  )
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -225,7 +292,7 @@ function HeaderSettings({
         </div>
 
         <Form {...form}>
-          <form className="space-y-4">
+          <form className="space-y-6">
             <FormField
               control={form.control}
               name="companyName"
@@ -236,6 +303,41 @@ function HeaderSettings({
                     <Input {...field} placeholder="Ex: XP Investimentos" />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="whatsappNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de WhatsApp</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="(XX) XXXXX-XXXX"
+                        onChange={(e) => handlePhoneChange(e, field.onChange)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="whatsappIcon"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Exibir ícone WhatsApp no cabeçalho</FormLabel>
+                  </div>
                 </FormItem>
               )}
             />

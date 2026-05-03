@@ -63,5 +63,44 @@ export function useSettings() {
     [settingsMap],
   )
 
-  return { settingsMap, getValue, getFileUrl, loading }
+  const updateSetting = useCallback(async (key: string, value: any, updatedBy: string) => {
+    let previousValue: any
+    let existed = false
+
+    setSettingsRecords((prev) => {
+      const existing = prev.find((r) => r.setting_key === key)
+      if (existing) {
+        existed = true
+        previousValue = existing.setting_value
+        return prev.map((r) => (r.setting_key === key ? { ...r, setting_value: value } : r))
+      }
+      return [
+        ...prev,
+        {
+          id: 'temp',
+          setting_key: key,
+          setting_value: value,
+          setting_file: '',
+          updated_by: updatedBy,
+        } as SiteSetting,
+      ]
+    })
+
+    try {
+      await updateSettingByKey(key, value, updatedBy)
+    } catch (error) {
+      setSettingsRecords((prev) => {
+        if (existed) {
+          return prev.map((r) =>
+            r.setting_key === key ? { ...r, setting_value: previousValue } : r,
+          )
+        } else {
+          return prev.filter((r) => r.id !== 'temp' || r.setting_key !== key)
+        }
+      })
+      throw error
+    }
+  }, [])
+
+  return { settingsMap, getValue, getFileUrl, loading, updateSetting }
 }
