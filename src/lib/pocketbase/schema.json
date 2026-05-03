@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-03T14:08:19.231Z",
+  "generatedAt": "2026-05-03T14:38:13.826Z",
   "collections": [
     {
       "name": "users",
@@ -260,6 +260,62 @@
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_site_settings_key ON site_settings (setting_key)"]
+    },
+    {
+      "name": "password_reset_tokens",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "reset_code",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "expires_at",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "used",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_pwd_reset_code ON password_reset_tokens (reset_code)",
+        "CREATE INDEX idx_pwd_reset_user ON password_reset_tokens (user_id)"
+      ]
     }
   ]
 }

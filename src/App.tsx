@@ -7,6 +7,8 @@ import Index from './pages/Index'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 import Login from './pages/Login'
+import EsqueceuSenha from './pages/EsqueceuSenha'
+import AlterarSenha from './pages/AlterarSenha'
 import AdminDashboard from './pages/admin/Dashboard'
 import AssessorProfile from './pages/assessor/Profile'
 import MeusClientes from './pages/assessor/MeusClientes'
@@ -39,6 +41,8 @@ const App = () => (
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
+            <Route path="/alterar-senha" element={<AlterarSenha />} />
             <Route path="/dashboard" element={<DashboardRouter />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/assessor/profile" element={<AssessorProfile />} />
