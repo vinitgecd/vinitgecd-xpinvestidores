@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,6 +14,15 @@
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
+
+    /* Status Colors */
+    --success: 152 68% 40%;
+    --success-light: 152 68% 95%;
+    --success-foreground: 152 68% 25%;
+    --warning: 38 92% 50%;
+    --warning-light: 38 92% 95%;
+    --info: 210 100% 50%;
+    --info-light: 210 100% 95%;
 
     /* XP Colors */
     --primary: 210 100% 20%; /* #003366 */
@@ -48,6 +57,14 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
+    --success: 152 68% 40%;
+    --success-light: 152 68% 10%;
+    --success-foreground: 152 68% 95%;
+    --warning: 38 92% 50%;
+    --warning-light: 38 92% 10%;
+    --info: 210 100% 50%;
+    --info-light: 210 100% 10%;
+
     --primary: 210 100% 20%;
     --primary-foreground: 0 0% 100%;
 
@@ -70,7 +87,7 @@
 
   html {
     scroll-behavior: smooth;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 14px;
   }
 
@@ -123,5 +140,22 @@
 
   .animate-fade-in-slow {
     animation: fade-in 0.5s ease-in-out forwards;
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-2px);
+    }
+    75% {
+      transform: translateX(2px);
+    }
+  }
+
+  .animate-shake {
+    animation: shake 0.3s ease-in-out forwards;
   }
 }

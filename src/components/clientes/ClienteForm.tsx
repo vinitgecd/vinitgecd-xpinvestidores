@@ -11,6 +11,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Loader2 } from 'lucide-react'
 
 const formSchema = z.object({
   nome: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -40,21 +41,31 @@ export function ClienteForm({
     let v = val.replace(/\D/g, '')
     if (v.length > 11) v = v.slice(0, 11)
     if (v.length > 2) v = v.replace(/^(\d{2})(\d)/g, '($1) $2')
-    if (v.length > 9) v = v.replace(/(\d{5})(\d)/, '$1-$2')
+    if (v.length > 7) v = v.replace(/(\d{4,5})(\d{4})$/, '$1-$2')
     return v
+  }
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0)
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
         <FormField
           control={form.control}
           name="nome"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome Completo</FormLabel>
+              <FormLabel className="text-sm font-semibold uppercase tracking-wide">
+                Nome Completo
+              </FormLabel>
               <FormControl>
-                <Input placeholder="Nome do cliente" {...field} />
+                <Input
+                  placeholder="Nome do cliente"
+                  className="h-11 transition-all duration-200 focus-visible:ring-primary focus-visible:ring-2"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,9 +77,14 @@ export function ClienteForm({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-sm font-semibold uppercase tracking-wide">Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="cliente@exemplo.com" {...field} />
+                <Input
+                  type="email"
+                  placeholder="cliente@exemplo.com"
+                  className="h-11 transition-all duration-200 focus-visible:ring-primary focus-visible:ring-2"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,12 +96,15 @@ export function ClienteForm({
           name="telefone"
           render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
-              <FormLabel>Telefone</FormLabel>
+              <FormLabel className="text-sm font-semibold uppercase tracking-wide">
+                Telefone
+              </FormLabel>
               <FormControl>
                 <Input
                   placeholder="(11) 99999-9999"
                   value={value}
                   onChange={(e) => onChange(maskPhone(e.target.value))}
+                  className="h-11 transition-all duration-200 focus-visible:ring-primary focus-visible:ring-2"
                   {...field}
                 />
               </FormControl>
@@ -97,19 +116,41 @@ export function ClienteForm({
         <FormField
           control={form.control}
           name="valor_investido"
-          render={({ field }) => (
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
-              <FormLabel>Valor Investido (R$)</FormLabel>
+              <FormLabel className="text-sm font-semibold uppercase tracking-wide">
+                Valor Investido (R$)
+              </FormLabel>
               <FormControl>
-                <Input type="number" step="0.01" max="9999999.99" placeholder="0.00" {...field} />
+                <Input
+                  type="text"
+                  placeholder="R$ 0,00"
+                  value={formatCurrency(Number(value))}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, '')
+                    onChange(Number(digits) / 100)
+                  }}
+                  className="h-11 text-right transition-all duration-200 focus-visible:ring-primary focus-visible:ring-2"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full h-11" disabled={loading}>
-          {loading ? 'Salvando...' : 'Salvar Cliente'}
+        <Button
+          type="submit"
+          className="w-full h-11 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Processando...
+            </>
+          ) : (
+            'Salvar Cliente'
+          )}
         </Button>
       </form>
     </Form>

@@ -27,10 +27,23 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter var', 'SF Pro Display', 'system-ui', 'sans-serif'],
-        display: ['SF Pro Display', 'Inter var', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter var', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Inter var', 'system-ui', 'sans-serif'],
       },
       colors: {
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          light: 'hsl(var(--success-light))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          light: 'hsl(var(--warning-light))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          light: 'hsl(var(--info-light))',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
