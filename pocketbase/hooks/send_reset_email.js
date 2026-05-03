@@ -11,8 +11,8 @@ routerAdd('POST', '/backend/v1/send-password-reset-email', (e) => {
     // Generate 6 digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString()
 
-    // Expiration date (15 mins from now)
-    const expiresAt = new Date(Date.now() + 15 * 60000).toISOString().replace('T', ' ')
+    // Expiration date (10 mins from now)
+    const expiresAt = new Date(Date.now() + 10 * 60000).toISOString().replace('T', ' ')
 
     const tokens = $app.findCollectionByNameOrId('password_reset_tokens')
     const record = new Record(tokens)
@@ -38,7 +38,7 @@ routerAdd('POST', '/backend/v1/send-password-reset-email', (e) => {
           from: 'noreply@resend.dev',
           to: email,
           subject: 'Codigo de recuperacao de senha',
-          html: `<p>Olá,</p><p>Seu código de recuperação de senha é: <strong>${code}</strong></p><p>Este código expira em 15 minutos.</p>`,
+          html: `<p>Olá,</p><p>Seu código de recuperação de senha é: <strong>${code}</strong></p><p>Este código expira em 10 minutos.</p>`,
         }),
         timeout: 10,
       })

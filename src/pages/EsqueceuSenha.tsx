@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { requestPasswordReset, verifyResetCode } from '@/services/auth'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/form'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { cn } from '@/lib/utils'
+import { usePasswordReset } from '@/hooks/use-password-reset'
 
 const emailSchema = z.object({ email: z.string().email('E-mail inválido') })
 const codeSchema = z
@@ -45,9 +46,18 @@ const calculateStrength = (pass: string) => {
 }
 
 export default function EsqueceuSenha() {
-  const [step, setStep] = useState<'email' | 'code' | 'success'>('email')
-  const [email, setEmail] = useState('')
-  const [error, setError] = useState('')
+  const {
+    step,
+    setStep,
+    email,
+    setEmail,
+    error,
+    setError,
+    resendCountdown,
+    startResendCountdown,
+    canResend,
+  } = usePasswordReset()
+
   const { toast } = useToast()
 
   const emailForm = useForm<z.infer<typeof emailSchema>>({
@@ -80,9 +90,21 @@ export default function EsqueceuSenha() {
       await requestPasswordReset(values.email)
       setEmail(values.email)
       setStep('code')
+      startResendCountdown()
       toast({ title: 'Código enviado', description: 'Verifique seu e-mail.' })
     } catch (err: any) {
       setError(err?.message || 'Erro ao enviar código.')
+    }
+  }
+
+  const handleResend = async () => {
+    try {
+      setError('')
+      await requestPasswordReset(email)
+      startResendCountdown()
+      toast({ description: 'Codigo reenviado para seu email' })
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao reenviar código.')
     }
   }
 
@@ -97,6 +119,10 @@ export default function EsqueceuSenha() {
   }
 
   const stepIdx = step === 'email' ? 0 : step === 'code' ? 1 : 2
+  const isExpiredError =
+    step === 'code' &&
+    error &&
+    (error.toLowerCase().includes('invalido') || error.toLowerCase().includes('expirado'))
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] bg-secondary/40 px-4 py-12 animate-fade-in">
@@ -125,11 +151,7 @@ export default function EsqueceuSenha() {
               style={{ width: `${(stepIdx / 2) * 100}%` }}
             />
             {['Email', 'Código', 'Sucesso'].map((s, i) => (
-              <div
-                key={s}
-                className="flex flex-col items-center gap-2 z-10"
-                aria-label={`Step: ${s}`}
-              >
+              <div key={s} className="flex flex-col items-center gap-2 z-10">
                 <div
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300',
@@ -146,10 +168,33 @@ export default function EsqueceuSenha() {
             ))}
           </div>
 
-          {error && (
+          {error && !isExpiredError && (
             <Alert variant="destructive" className="mb-6 animate-shake">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {isExpiredError && (
+            <Alert variant="destructive" className="mb-6 animate-shake">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="font-semibold">
+                  O codigo expirou ou esta incorreto.
+                </AlertDescription>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full text-foreground hover:text-foreground"
+                disabled={!canResend()}
+                onClick={handleResend}
+              >
+                {canResend()
+                  ? 'Reenviar Codigo'
+                  : `Voce pode reenviar em ${resendCountdown} segundos`}
+              </Button>
             </Alert>
           )}
 
@@ -215,7 +260,6 @@ export default function EsqueceuSenha() {
                                 key={i}
                                 index={i}
                                 className="h-12 w-10 sm:w-12 sm:h-14 text-lg font-mono font-bold text-foreground"
-                                aria-label={`Digit ${i + 1}`}
                               />
                             ))}
                           </InputOTPGroup>
@@ -294,13 +338,27 @@ export default function EsqueceuSenha() {
                     )}
                   />
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full h-12 md:h-11 hover:scale-[1.02] active:scale-[0.98]"
-                  disabled={codeForm.formState.isSubmitting}
-                >
-                  {codeForm.formState.isSubmitting ? 'Alterando...' : 'Alterar Senha'}
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full sm:w-1/3 h-12 md:h-11 hover:scale-[1.02] active:scale-[0.98]"
+                    onClick={() => {
+                      setStep('email')
+                      setError('')
+                      codeForm.reset()
+                    }}
+                  >
+                    Voltar
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="w-full sm:w-2/3 h-12 md:h-11 hover:scale-[1.02] active:scale-[0.98]"
+                    disabled={codeForm.formState.isSubmitting}
+                  >
+                    {codeForm.formState.isSubmitting ? 'Alterando...' : 'Alterar Senha'}
+                  </Button>
+                </div>
               </form>
             </Form>
           )}
