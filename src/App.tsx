@@ -13,6 +13,10 @@ import MeusClientes from './pages/assessor/MeusClientes'
 import NovoCliente from './pages/clientes/NovoCliente'
 import ClientesList from './pages/clientes/ClientesList'
 import { AuthProvider, useAuth } from './hooks/use-auth'
+import React, { Suspense } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const ConfiguracoesPage = React.lazy(() => import('./pages/admin/Configuracoes'))
 
 const DashboardRouter = () => {
   const { user, loading } = useAuth()
@@ -41,6 +45,21 @@ const App = () => (
             <Route path="/meus-clientes" element={<MeusClientes />} />
             <Route path="/novo-cliente" element={<NovoCliente />} />
             <Route path="/clientes" element={<ClientesList />} />
+            <Route
+              path="/configuracoes"
+              element={
+                <Suspense
+                  fallback={
+                    <div className="container mx-auto p-6 max-w-4xl space-y-6">
+                      <Skeleton className="h-10 w-48" />
+                      <Skeleton className="h-[400px] w-full" />
+                    </div>
+                  }
+                >
+                  <ConfiguracoesPage />
+                </Suspense>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES MUST BE ADDED HERE */}
           </Route>
           <Route path="*" element={<NotFound />} />

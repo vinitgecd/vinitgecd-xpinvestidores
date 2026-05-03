@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-03T13:49:22.023Z",
+  "generatedAt": "2026-05-03T14:08:19.231Z",
   "collections": [
     {
       "name": "users",
@@ -154,7 +154,7 @@
         {
           "name": "user_id",
           "type": "relation",
-          "required": true,
+          "required": false,
           "system": false,
           "collectionRef": "users"
         },
@@ -207,6 +207,59 @@
         "CREATE UNIQUE INDEX idx_clientes_user_id_email ON clientes (user_id, email)",
         "CREATE INDEX idx_clientes_created ON clientes (created DESC)"
       ]
+    },
+    {
+      "name": "site_settings",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.role = 'admin'",
+        "update": "@request.auth.role = 'admin'",
+        "delete": "@request.auth.role = 'admin'"
+      },
+      "fields": [
+        {
+          "name": "setting_key",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "setting_value",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "setting_file",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "updated_by",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_site_settings_key ON site_settings (setting_key)"]
     }
   ]
 }
