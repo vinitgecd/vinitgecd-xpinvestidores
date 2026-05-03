@@ -19,7 +19,7 @@ const formSchema = z.object({
   valor_investido: z.coerce
     .number()
     .min(0, 'Valor não pode ser negativo')
-    .max(999999.99, 'Valor máximo excedido'),
+    .max(9999999.99, 'Valor maximo permitido: R$ 9.999.999,99'),
 })
 
 export function ClienteForm({
@@ -101,7 +101,7 @@ export function ClienteForm({
             <FormItem>
               <FormLabel>Valor Investido (R$)</FormLabel>
               <FormControl>
-                <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                <Input type="number" step="0.01" max="9999999.99" placeholder="0.00" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
