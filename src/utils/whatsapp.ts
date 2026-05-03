@@ -1,5 +1,20 @@
+export function unformatPhone(phone: string): string {
+  return phone.replace(/\D/g, '')
+}
+
+export function formatPhoneInput(phone: string): string {
+  let digits = unformatPhone(phone)
+  if (digits.length >= 13 && digits.startsWith('55')) {
+    digits = digits.substring(2)
+  }
+  if (digits.length === 0) return ''
+  if (digits.length <= 2) return `(${digits}`
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
+}
+
 export function formatPhoneForWhatsApp(phone: string): string {
-  const digits = phone.replace(/\D/g, '')
+  const digits = unformatPhone(phone)
   if (!digits) return ''
   if (digits.startsWith('55')) {
     return digits

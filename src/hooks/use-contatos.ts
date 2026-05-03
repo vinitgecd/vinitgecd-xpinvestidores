@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getContatos, Contato } from '@/services/contatos'
+import {
+  getContatos,
+  Contato,
+  updateAdvisorWhatsApp as updateAdvisorWhatsAppService,
+} from '@/services/contatos'
 import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from 'sonner'
+import { unformatPhone } from '@/utils/whatsapp'
 
 export function useContatos() {
   const [contatos, setContatos] = useState<Contato[]>([])
@@ -41,5 +46,13 @@ export function useContatos() {
 
   const hasWhatsApp = !!contatos.find((c) => c.tipo === 'whatsapp' && c.ativo)
 
-  return { contatos, loading, error, getWhatsAppUrl, hasWhatsApp }
+  const updateAdvisorWhatsApp = async (userId: string, phone: string) => {
+    const digits = unformatPhone(phone)
+    if (digits && digits.length !== 11) {
+      throw new Error('Número de telefone inválido. Use formato (XX) XXXXX-XXXX')
+    }
+    return updateAdvisorWhatsAppService(userId, digits)
+  }
+
+  return { contatos, loading, error, getWhatsAppUrl, hasWhatsApp, updateAdvisorWhatsApp }
 }

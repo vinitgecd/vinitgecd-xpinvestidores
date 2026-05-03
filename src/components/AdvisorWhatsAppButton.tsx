@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { MessageCircle, Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getAdvisorWhatsApp } from '@/services/contatos'
-import { redirectToWhatsApp } from '@/utils/whatsapp'
+import { redirectToWhatsApp, unformatPhone } from '@/utils/whatsapp'
 import { toast } from 'sonner'
 
 interface AdvisorWhatsAppButtonProps {
@@ -45,7 +45,8 @@ export function AdvisorWhatsAppButton({ advisorId, advisorName }: AdvisorWhatsAp
   const handleClick = useCallback(() => {
     if (phone) {
       try {
-        redirectToWhatsApp(phone, `Olá! Gostaria de falar com ${advisorName}`)
+        const rawDigits = unformatPhone(phone)
+        redirectToWhatsApp(rawDigits, `Olá! Gostaria de falar com ${advisorName}`)
       } catch (e: any) {
         toast.error('Número de WhatsApp inválido')
       }

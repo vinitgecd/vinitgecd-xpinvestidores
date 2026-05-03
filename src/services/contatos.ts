@@ -37,3 +37,11 @@ export const getAdvisorWhatsApp = async (advisorId: string): Promise<string> => 
     throw new Error('WhatsApp não configurado para este assessor')
   }
 }
+
+export const updateAdvisorWhatsApp = async (userId: string, whatsapp: string): Promise<void> => {
+  const digits = whatsapp.replace(/\D/g, '')
+  if (digits && digits.length !== 11) {
+    throw new Error('Número de telefone inválido. Use formato (XX) XXXXX-XXXX')
+  }
+  await pb.collection('users').update(userId, { whatsapp: digits })
+}

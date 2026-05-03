@@ -3,6 +3,8 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { getAssessorByUserId, updateAssessor, Assessor } from '@/services/assessores'
 import pb from '@/lib/pocketbase/client'
+import { formatPhoneInput, unformatPhone } from '@/utils/whatsapp'
+import { updateAdvisorWhatsApp } from '@/services/contatos'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -42,10 +44,10 @@ export default function AssessorProfile() {
       getAssessorByUserId(user.id)
         .then((data) => {
           setAssessor(data)
-          const initial = fields.reduce(
-            (acc, f) => ({ ...acc, [f.id]: (data as any)[f.id] || '' }),
-            {},
-          )
+          const initial = fields.reduce((acc, f) => {
+            const val = (data as any)[f.id] || ''
+            return { ...acc, [f.id]: f.id === 'whatsapp' && val ? formatPhoneInput(val) : val }
+          }, {})
           setFormData(initial)
           if (data.foto_perfil) {
             setPreviewUrl(pb.files.getURL(data, data.foto_perfil))
@@ -85,11 +87,26 @@ export default function AssessorProfile() {
     if (!assessor) return
     setSaving(true)
     setErrors({})
+
+    let whatsappUnformatted = ''
+    if (formData.whatsapp) {
+      whatsappUnformatted = unformatPhone(formData.whatsapp)
+      if (whatsappUnformatted.length > 0 && whatsappUnformatted.length !== 11) {
+        setErrors({ whatsapp: 'Número de telefone inválido. Use formato (XX) XXXXX-XXXX' })
+        setSaving(false)
+        return
+      }
+    }
+
     try {
       const payload = new FormData()
 
       Object.keys(formData).forEach((key) => {
-        payload.append(key, formData[key])
+        if (key === 'whatsapp') {
+          payload.append(key, whatsappUnformatted)
+        } else {
+          payload.append(key, formData[key])
+        }
       })
 
       if (selectedFile) {
@@ -99,11 +116,16 @@ export default function AssessorProfile() {
       }
 
       const updated = await updateAssessor(assessor.id, payload)
-      if (formData.whatsapp !== undefined) {
+      if (whatsappUnformatted !== undefined) {
         try {
-          await pb.collection('users').update(assessor.user_id, { whatsapp: formData.whatsapp })
-        } catch (e) {
+          await updateAdvisorWhatsApp(assessor.user_id, whatsappUnformatted)
+        } catch (e: any) {
           console.error('Failed to update user whatsapp', e)
+          toast({
+            variant: 'destructive',
+            title: 'Erro',
+            description: e.message || 'Erro ao conectar. Tente novamente',
+          })
         }
       }
       setAssessor(updated)
@@ -208,8 +230,17 @@ export default function AssessorProfile() {
                   <Input
                     id={f.id}
                     value={formData[f.id] || ''}
-                    onChange={(e) => setFormData({ ...formData, [f.id]: e.target.value })}
+                    onChange={(e) => {
+                      let val = e.target.value
+                      if (f.id === 'whatsapp') {
+                        val = formatPhoneInput(val)
+                      }
+                      setFormData({ ...formData, [f.id]: val })
+                    }}
                     required={f.req}
+                    maxLength={f.id === 'whatsapp' ? 18 : undefined}
+                    placeholder={f.id === 'whatsapp' ? '(XX) XXXXX-XXXX' : undefined}
+                    pattern={f.id === 'whatsapp' ? '[\\d\\s\\-\\(\\)\\+]+' : undefined}
                   />
                   {errors[f.id] && <p className="text-sm text-red-500">{errors[f.id]}</p>}
                 </div>
