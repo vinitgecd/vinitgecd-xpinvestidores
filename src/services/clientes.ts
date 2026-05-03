@@ -48,3 +48,17 @@ export const updateCliente = async (id: string, data: Partial<Cliente>) => {
 export const deleteCliente = async (id: string) => {
   return pb.collection('clientes').delete(id)
 }
+
+export const reassignClientsByAdvisor = async (advisorId: string): Promise<number> => {
+  const clients = await pb.collection('clientes').getFullList({
+    filter: `user_id = "${advisorId}"`,
+  })
+
+  let count = 0
+  for (const client of clients) {
+    await pb.collection('clientes').update(client.id, { user_id: '' })
+    count++
+  }
+
+  return count
+}

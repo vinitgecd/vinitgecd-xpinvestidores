@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
-import { getAllAssessores, deleteAssessor, Assessor } from '@/services/assessores'
-import { deleteUser } from '@/services/users'
+import { getAllAssessores, Assessor } from '@/services/assessores'
+import { deleteAdvisor } from '@/services/users'
 import { Button } from '@/components/ui/button'
+import { ConfirmDeleteAdvisorDialog } from '@/components/ConfirmDeleteAdvisorDialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -20,6 +21,10 @@ export default function AdminDashboard() {
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAssessor, setEditingAssessor] = useState<Assessor | null>(null)
+
+  const [advisorToDelete, setAdvisorToDelete] = useState<Assessor | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const loadData = async () => {
     try {
@@ -40,16 +45,33 @@ export default function AdminDashboard() {
     if (user?.role === 'admin') loadData()
   })
 
-  const handleDelete = async (assessor: Assessor) => {
-    if (window.confirm(`Deseja realmente remover o assessor ${assessor.nome}?`)) {
-      try {
-        await deleteAssessor(assessor.id)
-        if (assessor.user_id) await deleteUser(assessor.user_id)
-        toast({ title: 'Sucesso', description: 'Assessor removido com sucesso.' })
-      } catch (err: any) {
-        toast({ variant: 'destructive', title: 'Erro', description: err.message })
-      }
+  const handleDeleteClick = (assessor: Assessor) => {
+    setAdvisorToDelete(assessor)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!advisorToDelete) return
+    setIsDeleting(true)
+    try {
+      await deleteAdvisor(advisorToDelete.id)
+      toast({ title: 'Sucesso', description: 'Assessor deletado com sucesso!' })
+      setDeleteDialogOpen(false)
+      loadData()
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível deletar o assessor.',
+      })
+    } finally {
+      setIsDeleting(false)
     }
+  }
+
+  const handleCancelDelete = () => {
+    setAdvisorToDelete(null)
+    setDeleteDialogOpen(false)
   }
 
   const openEdit = (a: Assessor) => {
@@ -134,7 +156,11 @@ export default function AdminDashboard() {
                       <Button variant="ghost" size="icon" onClick={() => openEdit(assessor)}>
                         <Edit className="h-4 w-4 text-blue-600" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(assessor)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteClick(assessor)}
+                      >
                         <Trash2 className="h-4 w-4 text-red-600" />
                       </Button>
                     </td>
@@ -150,6 +176,15 @@ export default function AdminDashboard() {
         onOpenChange={setDialogOpen}
         assessor={editingAssessor}
         onSuccess={loadData}
+      />
+      <ConfirmDeleteAdvisorDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) handleCancelDelete()
+        }}
+        onConfirm={handleConfirmDelete}
+        advisorName={advisorToDelete?.nome}
+        isLoading={isDeleting}
       />
     </div>
   )
