@@ -27,6 +27,16 @@ export const getAllClientes = async () => {
   return pb.collection('clientes').getFullList<Cliente>({ expand: 'user_id' })
 }
 
+export const getClientesByCurrentUser = async () => {
+  const userId = pb.authStore.record?.id
+  if (!userId) throw new Error('Usuário não autenticado')
+  return pb.collection('clientes').getFullList<Cliente>({
+    filter: `user_id = "${userId}"`,
+    sort: '-created',
+    expand: 'user_id',
+  })
+}
+
 export const createCliente = async (data: Partial<Cliente>) => {
   return pb.collection('clientes').create<Cliente>(data)
 }

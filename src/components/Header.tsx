@@ -38,6 +38,12 @@ export function Header() {
               ) : (
                 <>
                   <Link
+                    to="/meus-clientes"
+                    className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Meus Clientes
+                  </Link>
+                  <Link
                     to="/assessor/profile"
                     className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                   >

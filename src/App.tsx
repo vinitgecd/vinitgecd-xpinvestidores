@@ -9,6 +9,7 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import AdminDashboard from './pages/admin/Dashboard'
 import AssessorProfile from './pages/assessor/Profile'
+import MeusClientes from './pages/assessor/MeusClientes'
 import NovoCliente from './pages/clientes/NovoCliente'
 import ClientesList from './pages/clientes/ClientesList'
 import { AuthProvider, useAuth } from './hooks/use-auth'
@@ -17,8 +18,8 @@ const DashboardRouter = () => {
   const { user, loading } = useAuth()
   if (loading) return null
   if (!user) return <Navigate to="/login" replace />
-  if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />
-  return <Navigate to="/assessor/profile" replace />
+  if (user.role === 'admin') return <Navigate to="/clientes" replace />
+  return <Navigate to="/meus-clientes" replace />
 }
 
 // ONLY IMPORT AND RENDER WORKING PAGES, NEVER ADD PLACEHOLDER COMPONENTS OR PAGES IN THIS FILE
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/dashboard" element={<DashboardRouter />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/assessor/profile" element={<AssessorProfile />} />
+            <Route path="/meus-clientes" element={<MeusClientes />} />
             <Route path="/novo-cliente" element={<NovoCliente />} />
             <Route path="/clientes" element={<ClientesList />} />
             {/* ADD ALL CUSTOM ROUTES MUST BE ADDED HERE */}
