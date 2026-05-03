@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getContatos, Contato } from '@/services/contatos'
 import { useRealtime } from '@/hooks/use-realtime'
 import { toast } from 'sonner'
@@ -31,7 +31,15 @@ export function useContatos() {
     loadData()
   })
 
-  const whatsapp = contatos.find((c) => c.tipo === 'whatsapp' && c.ativo)
+  const getWhatsAppUrl = useCallback(() => {
+    const whatsappContato = contatos.find((c) => c.tipo === 'whatsapp' && c.ativo)
+    if (!whatsappContato) {
+      throw new Error('Numero de WhatsApp nao configurado')
+    }
+    return whatsappContato.valor
+  }, [contatos])
 
-  return { contatos, loading, error, whatsapp }
+  const hasWhatsApp = !!contatos.find((c) => c.tipo === 'whatsapp' && c.ativo)
+
+  return { contatos, loading, error, getWhatsAppUrl, hasWhatsApp }
 }

@@ -1,9 +1,11 @@
+import { useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, Loader2 } from 'lucide-react'
 import { useContatos } from '@/hooks/use-contatos'
-import { getWhatsAppUrl } from '@/utils/whatsapp'
+import { redirectToWhatsApp } from '@/utils/whatsapp'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface WhatsAppButtonProps {
   variant?: 'button' | 'icon' | 'link'
@@ -12,15 +14,20 @@ interface WhatsAppButtonProps {
 }
 
 export function WhatsAppButton({ variant = 'button', message, className }: WhatsAppButtonProps) {
-  const { whatsapp, loading } = useContatos()
+  const { loading, getWhatsAppUrl, hasWhatsApp } = useContatos()
 
-  const handleClick = () => {
-    if (whatsapp) {
-      window.open(getWhatsAppUrl(whatsapp.valor, message), '_blank', 'noopener,noreferrer')
+  const handleClick = useCallback(() => {
+    try {
+      const phone = getWhatsAppUrl()
+      redirectToWhatsApp(phone, message)
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      }
     }
-  }
+  }, [getWhatsAppUrl, message])
 
-  const disabled = !whatsapp || loading
+  const disabled = !hasWhatsApp || loading
 
   const renderContent = () => {
     if (variant === 'icon') {
@@ -32,7 +39,11 @@ export function WhatsAppButton({ variant = 'button', message, className }: Whats
           disabled={disabled}
           onClick={handleClick}
         >
-          <MessageCircle className="h-5 w-5 text-green-500" />
+          {loading ? (
+            <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
+          ) : (
+            <MessageCircle className="h-5 w-5 text-green-500" />
+          )}
         </Button>
       )
     }
@@ -41,13 +52,17 @@ export function WhatsAppButton({ variant = 'button', message, className }: Whats
       return (
         <button
           className={cn(
-            'hover:text-green-500 transition-colors flex items-center gap-2',
+            'hover:text-green-500 transition-colors flex items-center gap-2 disabled:opacity-50',
             className,
           )}
           disabled={disabled}
           onClick={handleClick}
         >
-          <MessageCircle className="h-4 w-4" />
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <MessageCircle className="h-4 w-4" />
+          )}
           <span>WhatsApp</span>
         </button>
       )
@@ -59,19 +74,23 @@ export function WhatsAppButton({ variant = 'button', message, className }: Whats
         disabled={disabled}
         onClick={handleClick}
       >
-        <MessageCircle className="mr-2 h-4 w-4" />
+        {loading ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <MessageCircle className="mr-2 h-4 w-4" />
+        )}
         Falar no WhatsApp
       </Button>
     )
   }
 
-  if (disabled && !loading) {
+  if (!hasWhatsApp && !loading) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="inline-block cursor-not-allowed">{renderContent()}</div>
         </TooltipTrigger>
-        <TooltipContent>Número de WhatsApp não configurado</TooltipContent>
+        <TooltipContent>Numero de WhatsApp nao configurado</TooltipContent>
       </Tooltip>
     )
   }

@@ -1,6 +1,9 @@
 export function formatPhoneForWhatsApp(phone: string): string {
   const digits = phone.replace(/\D/g, '')
   if (!digits) return ''
+  if (digits.startsWith('55')) {
+    return digits
+  }
   return `55${digits}`
 }
 
@@ -13,14 +16,24 @@ export function detectDevice(): 'mobile' | 'desktop' {
   return isMobileUa || isSmallScreen ? 'mobile' : 'desktop'
 }
 
-export function getWhatsAppUrl(phone: string, message?: string): string {
+export function generateWhatsAppUrl(phone: string, message?: string): string {
+  const formattedPhone = formatPhoneForWhatsApp(phone)
+  return `https://wa.me/${formattedPhone}${message ? `?text=${encodeURIComponent(message)}` : ''}`
+}
+
+export function generateWhatsAppWebUrl(phone: string, message?: string): string {
+  const formattedPhone = formatPhoneForWhatsApp(phone)
+  return `https://web.whatsapp.com/send?phone=${formattedPhone}${message ? `&text=${encodeURIComponent(message)}` : ''}`
+}
+
+export function redirectToWhatsApp(phone: string, message?: string): void {
   const formattedPhone = formatPhoneForWhatsApp(phone)
   const device = detectDevice()
-  const baseUrl = device === 'mobile' ? 'https://wa.me/' : 'https://web.whatsapp.com/send'
 
-  if (device === 'mobile') {
-    return `${baseUrl}${formattedPhone}${message ? `?text=${encodeURIComponent(message)}` : ''}`
-  } else {
-    return `${baseUrl}?phone=${formattedPhone}${message ? `&text=${encodeURIComponent(message)}` : ''}`
-  }
+  const url =
+    device === 'mobile'
+      ? generateWhatsAppUrl(formattedPhone, message)
+      : generateWhatsAppWebUrl(formattedPhone, message)
+
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
