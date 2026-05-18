@@ -15,14 +15,17 @@ export function Footer() {
 
   if (loading) {
     return (
-      <footer id="contato" className="bg-[#003366] text-white py-[40px] px-[20px] text-center">
+      <footer
+        id="contato"
+        className="bg-[#111111] text-white py-[60px] px-[20px] text-center border-t border-white/5"
+      >
         <div className="container mx-auto max-w-6xl flex flex-col items-center">
-          <Skeleton className="h-8 w-48 bg-white/20 mb-4" />
-          <Skeleton className="h-4 w-64 bg-white/20 mb-8" />
+          <Skeleton className="h-8 w-48 bg-white/10 mb-4" />
+          <Skeleton className="h-4 w-64 bg-white/10 mb-8" />
           <div className="flex gap-8 mb-8">
-            <Skeleton className="h-6 w-32 bg-white/20" />
-            <Skeleton className="h-6 w-32 bg-white/20" />
-            <Skeleton className="h-6 w-32 bg-white/20" />
+            <Skeleton className="h-6 w-32 bg-white/10" />
+            <Skeleton className="h-6 w-32 bg-white/10" />
+            <Skeleton className="h-6 w-32 bg-white/10" />
           </div>
         </div>
       </footer>
@@ -43,52 +46,66 @@ export function Footer() {
   }
 
   return (
-    <footer id="contato" className="bg-[#003366] text-white py-[40px] px-[20px] text-center">
+    <footer
+      id="contato"
+      className="bg-[#111111] text-white py-[60px] px-[20px] text-center border-t border-white/5 relative z-10 pb-24 md:pb-[60px]"
+    >
       <div className="container mx-auto max-w-6xl flex flex-col items-center">
-        <h3 className="text-2xl font-bold mb-4">{companyName}</h3>
-        <p className="text-white/80 text-sm leading-relaxed max-w-md mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="text-white"
+          >
+            <path
+              d="M4 20L10 4L16 20M10 4L16 12L22 4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <h3 className="text-xl font-bold tracking-tighter">Argentum</h3>
+        </div>
+
+        <p className="text-white/60 text-sm leading-relaxed max-w-md mb-10">
           Especialistas dedicados a potencializar seus investimentos com a segurança, transparência
           e expertise que você confia.
         </p>
 
-        <div className="flex flex-col md:flex-row gap-8 md:gap-16 mb-8 text-sm items-center justify-center">
-          <div className="flex items-center space-x-2">
-            <Phone className="h-5 w-5 text-[#FF6B35]" />
-            <a
-              href={`tel:${phone.replace(/\D/g, '')}`}
-              className="hover:text-[#FF6B35] transition-colors"
-            >
-              {phone}
-            </a>
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 mb-10 text-sm items-center justify-center">
+          <div className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors group">
+            <div className="p-2 rounded-full bg-white/5 group-hover:bg-[#4da2ff]/20 transition-colors">
+              <Phone className="h-4 w-4 text-[#4da2ff]" />
+            </div>
+            <a href={`tel:${phone.replace(/\D/g, '')}`}>{phone}</a>
           </div>
-          <div className="flex items-center space-x-2">
-            <Mail className="h-5 w-5 text-[#FF6B35]" />
-            <a href={`mailto:${email}`} className="hover:text-[#FF6B35] transition-colors">
-              {email}
-            </a>
+          <div className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors group">
+            <div className="p-2 rounded-full bg-white/5 group-hover:bg-[#4da2ff]/20 transition-colors">
+              <Mail className="h-4 w-4 text-[#4da2ff]" />
+            </div>
+            <a href={`mailto:${email}`}>{email}</a>
           </div>
-          <div className="flex items-center space-x-2 text-left">
-            <MapPin className="h-5 w-5 flex-shrink-0 text-[#FF6B35]" />
+          <div className="flex items-center space-x-3 text-white/80 hover:text-white transition-colors group text-left">
+            <div className="p-2 rounded-full bg-white/5 group-hover:bg-[#4da2ff]/20 transition-colors">
+              <MapPin className="h-4 w-4 flex-shrink-0 text-[#4da2ff]" />
+            </div>
             <span>{address}</span>
-          </div>
-          <div className="flex items-center">
-            <WhatsAppButton
-              variant="link"
-              label="WhatsApp"
-              className="text-white hover:text-[#FF6B35]"
-            />
           </div>
         </div>
 
         {socialLinks.length > 0 && (
-          <div className="flex space-x-4 mb-8">
+          <div className="flex space-x-4 mb-10">
             {socialLinks.map((link: { platform: string; url: string }, index: number) => (
               <a
                 key={index}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 rounded-full bg-white/10 hover:bg-[#FF6B35] hover:text-white transition-all duration-300 ease-in-out transform hover:scale-110"
+                className="p-3 rounded-full bg-white/5 text-white/80 hover:bg-[#4da2ff] hover:text-white transition-all duration-300 ease-in-out transform hover:scale-110"
                 aria-label={link.platform}
               >
                 {renderIcon(link.platform)}
@@ -98,8 +115,8 @@ export function Footer() {
           </div>
         )}
 
-        <div className="pt-8 border-t border-white/20 text-xs text-white/60 max-w-3xl w-full whitespace-pre-line">
-          {copyright}
+        <div className="pt-8 border-t border-white/10 text-xs text-white/40 max-w-3xl w-full whitespace-pre-line">
+          {copyright || '© 2026 Argentum Investimentos. Todos os direitos reservados.'}
         </div>
       </div>
     </footer>
