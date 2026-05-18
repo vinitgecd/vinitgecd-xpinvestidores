@@ -68,7 +68,7 @@ export default function MeusClientes() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 text-center font-sans animate-fade-in">
+      <div className="flex flex-col items-center justify-center pt-32 pb-16 px-4 text-center font-sans animate-fade-in">
         <AlertCircle className="h-16 w-16 text-destructive mb-4" />
         <h2 className="text-2xl font-bold mb-2">Erro ao carregar clientes</h2>
         <p className="text-muted-foreground mb-6">Ocorreu um problema ao buscar os seus dados.</p>
@@ -80,7 +80,7 @@ export default function MeusClientes() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8 animate-fade-in transition-all duration-300 font-sans">
+    <div className="container mx-auto pt-28 md:pt-32 pb-8 px-4 space-y-8 animate-fade-in transition-all duration-300 font-sans">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Meus Clientes</h1>
         <Link to="/novo-cliente">
