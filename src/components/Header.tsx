@@ -67,12 +67,6 @@ export function Header() {
             A Argentum
           </a>
           <a
-            href="/#solucoes"
-            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-          >
-            Soluções
-          </a>
-          <a
             href="/#assessores"
             className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
           >
