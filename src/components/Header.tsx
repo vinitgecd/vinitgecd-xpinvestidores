@@ -1,13 +1,18 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
+import { Menu, X } from 'lucide-react'
 
 export function Header() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const isHomePage = location.pathname === '/'
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,6 +64,8 @@ export function Header() {
             xp
           </div>
         </Link>
+
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
           <a
             href="/#argentum"
@@ -72,12 +79,14 @@ export function Header() {
           >
             Assessores
           </a>
-          <a
-            href="/#contato"
-            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-          >
-            Fale conosco
-          </a>
+          {isHomePage && (
+            <a
+              href="/#contato"
+              className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+            >
+              Fale conosco
+            </a>
+          )}
 
           {user ? (
             <div className="flex items-center gap-4 ml-4 pl-4 border-l border-white/20">
@@ -110,7 +119,80 @@ export function Header() {
             </div>
           )}
         </nav>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden text-white p-2 focus:outline-none"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle mobile menu"
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+
+      {/* Mobile Nav */}
+      {mobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-[#111111]/95 backdrop-blur-md border-b border-white/10 shadow-xl py-4 flex flex-col items-center gap-4 animate-in slide-in-from-top-2">
+          <a
+            href="/#argentum"
+            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            A Argentum
+          </a>
+          <a
+            href="/#assessores"
+            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Assessores
+          </a>
+          {isHomePage && (
+            <a
+              href="/#contato"
+              className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Fale conosco
+            </a>
+          )}
+
+          {user ? (
+            <div className="flex flex-col items-center gap-4 mt-2 pt-4 border-t border-white/10 w-full">
+              <Link
+                to={user.role === 'admin' ? '/clientes' : '/meus-clientes'}
+                className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  handleLogout()
+                  setMobileMenuOpen(false)
+                }}
+                className="bg-white/5 text-white border-white/10 hover:bg-white/10 hover:text-white transition-colors min-w-[120px]"
+              >
+                Sair
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-4 mt-2 pt-4 border-t border-white/10 w-full">
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="bg-white/5 text-white border-white/10 hover:bg-white/10 hover:text-white transition-colors"
+                >
+                  Área do Assessor
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   )
 }
