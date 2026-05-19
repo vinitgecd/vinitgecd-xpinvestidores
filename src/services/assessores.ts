@@ -22,6 +22,7 @@ export const getAllAssessores = () =>
   pb.collection('assessores').getFullList<Assessor>({ sort: 'created', expand: 'user_id' })
 export const getAssessorByUserId = (userId: string) =>
   pb.collection('assessores').getFirstListItem<Assessor>(`user_id = "${userId}"`)
+export const getAssessorById = (id: string) => pb.collection('assessores').getOne<Assessor>(id)
 export const updateAssessor = (id: string, data: Partial<Assessor> | FormData) =>
   pb.collection('assessores').update<Assessor>(id, data)
 export const createAssessor = (data: Partial<Assessor>) =>

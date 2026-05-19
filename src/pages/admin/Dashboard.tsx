@@ -9,7 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useToast } from '@/hooks/use-toast'
-import { RefreshCw, ShieldAlert, Plus, Edit, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { RefreshCw, ShieldAlert, Plus, Edit, Trash2, User as UserIcon } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AssessorFormDialog } from './AssessorFormDialog'
 
@@ -153,13 +154,24 @@ export default function AdminDashboard() {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(assessor)}>
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link to={`/perfil-do-avaliador/${assessor.id}`} title="Ver Perfil">
+                          <UserIcon className="h-4 w-4 text-green-600" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEdit(assessor)}
+                        title="Editar rápido"
+                      >
                         <Edit className="h-4 w-4 text-blue-600" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDeleteClick(assessor)}
+                        title="Excluir"
                       >
                         <Trash2 className="h-4 w-4 text-red-600" />
                       </Button>

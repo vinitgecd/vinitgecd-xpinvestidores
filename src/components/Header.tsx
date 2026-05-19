@@ -96,6 +96,14 @@ export function Header() {
               >
                 Dashboard
               </Link>
+              {(user.role === 'assessor' || user.role === 'admin') && (
+                <Link
+                  to="/perfil-do-avaliador"
+                  className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                >
+                  Meu Perfil
+                </Link>
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -166,6 +174,15 @@ export function Header() {
               >
                 Dashboard
               </Link>
+              {(user.role === 'assessor' || user.role === 'admin') && (
+                <Link
+                  to="/perfil-do-avaliador"
+                  className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Meu Perfil
+                </Link>
+              )}
               <Button
                 variant="outline"
                 size="sm"

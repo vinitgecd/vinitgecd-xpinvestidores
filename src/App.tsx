@@ -47,7 +47,8 @@ const App = () => (
             <Route path="/alterar-senha" element={<AlterarSenha />} />
             <Route path="/dashboard" element={<DashboardRouter />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/assessor/profile" element={<AssessorProfile />} />
+            <Route path="/perfil-do-avaliador" element={<AssessorProfile />} />
+            <Route path="/perfil-do-avaliador/:id" element={<AssessorProfile />} />
             <Route path="/meus-clientes" element={<MeusClientes />} />
             <Route path="/novo-cliente" element={<NovoCliente />} />
             <Route path="/clientes" element={<ClientesList />} />

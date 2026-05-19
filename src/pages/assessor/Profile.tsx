@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useParams, Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
-import { getAssessorByUserId, updateAssessor, Assessor } from '@/services/assessores'
+import {
+  getAssessorByUserId,
+  updateAssessor,
+  getAssessorById,
+  Assessor,
+} from '@/services/assessores'
 import pb from '@/lib/pocketbase/client'
 import { formatPhoneInput, unformatPhone } from '@/utils/whatsapp'
 import { updateAdvisorWhatsApp } from '@/services/contatos'
@@ -10,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ShieldAlert, Save, Upload, Trash2 } from 'lucide-react'
+import { ShieldAlert, Save, Upload, Trash2, ArrowLeft } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { extractFieldErrors } from '@/lib/pocketbase/errors'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -28,6 +33,7 @@ const fields = [
 
 export default function AssessorProfile() {
   const { user, loading: authLoading } = useAuth()
+  const { id: targetAssessorId } = useParams()
   const { toast } = useToast()
   const [assessor, setAssessor] = useState<Assessor | null>(null)
   const [loading, setLoading] = useState(true)
@@ -40,8 +46,12 @@ export default function AssessorProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (user?.role === 'assessor') {
-      getAssessorByUserId(user.id)
+    if (user?.role === 'assessor' || user?.role === 'admin') {
+      const fetchPromise = targetAssessorId
+        ? getAssessorById(targetAssessorId)
+        : getAssessorByUserId(user.id)
+
+      fetchPromise
         .then((data) => {
           setAssessor(data)
           const initial = fields.reduce((acc, f) => {
@@ -53,10 +63,16 @@ export default function AssessorProfile() {
             setPreviewUrl(pb.files.getURL(data, data.foto_perfil))
           }
         })
-        .catch(() => toast({ variant: 'destructive', title: 'Erro ao carregar perfil' }))
+        .catch((err) => {
+          if (err.status !== 404) {
+            toast({ variant: 'destructive', title: 'Erro ao carregar perfil' })
+          }
+        })
         .finally(() => setLoading(false))
+    } else if (user) {
+      setLoading(false)
     }
-  }, [user, toast])
+  }, [user, toast, targetAssessorId])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -116,7 +132,7 @@ export default function AssessorProfile() {
       }
 
       const updated = await updateAssessor(assessor.id, payload)
-      if (whatsappUnformatted !== undefined) {
+      if (whatsappUnformatted !== undefined && assessor.user_id) {
         try {
           await updateAdvisorWhatsApp(assessor.user_id, whatsappUnformatted)
         } catch (e: any) {
@@ -145,24 +161,48 @@ export default function AssessorProfile() {
     }
   }
 
-  if (authLoading) return <div className="p-8">Carregando...</div>
+  if (authLoading) return <div className="p-8 pt-24 text-center">Carregando...</div>
   if (!user) return <Navigate to="/login" />
-  if (user.role !== 'assessor') {
+  if (user.role !== 'assessor' && user.role !== 'admin') {
     return (
-      <div className="flex flex-col items-center justify-center p-20">
+      <div className="flex flex-col items-center justify-center p-20 pt-32">
         <Alert variant="destructive" className="max-w-md">
           <ShieldAlert className="h-4 w-4" />
           <AlertTitle>Acesso Negado</AlertTitle>
-          <AlertDescription>Página restrita.</AlertDescription>
+          <AlertDescription>Página restrita a assessores e administradores.</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  if (!loading && !assessor) {
+    return (
+      <div className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
+        <Alert variant="default" className="max-w-md mx-auto">
+          <ShieldAlert className="h-4 w-4" />
+          <AlertTitle>Perfil não encontrado</AlertTitle>
+          <AlertDescription>
+            Nenhum perfil de assessor associado.
+            {user.role === 'admin' && ' Como administrador, você pode não ter um perfil público.'}
+          </AlertDescription>
         </Alert>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#003366]">Meu Perfil</h1>
+    <div className="container mx-auto px-4 py-8 pt-24 max-w-4xl min-h-screen">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold text-[#003366]">
+          {targetAssessorId && user.role === 'admin' ? 'Editar Perfil do Assessor' : 'Meu Perfil'}
+        </h1>
+        {targetAssessorId && user.role === 'admin' && (
+          <Button variant="outline" asChild>
+            <Link to="/admin/dashboard" className="gap-2">
+              <ArrowLeft className="h-4 w-4" /> Voltar ao Dashboard
+            </Link>
+          </Button>
+        )}
       </div>
       {loading ? (
         <Card>
@@ -175,7 +215,7 @@ export default function AssessorProfile() {
         <Card className="border-t-4 border-t-[#FF6B35]">
           <CardHeader>
             <CardTitle>Informações Públicas</CardTitle>
-            <CardDescription>Estes dados serão visíveis para todos os clientes.</CardDescription>
+            <CardDescription>Estes dados serão visíveis para os clientes.</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -224,7 +264,7 @@ export default function AssessorProfile() {
               {fields.map((f) => (
                 <div
                   key={f.id}
-                  className={`space-y-2 ${f.id === 'habilidades' || f.id === 'certificacoes' ? 'md:col-span-2' : ''}`}
+                  className={`space-y-2 ${f.id === 'habilidades' || f.id === 'certificacoes' || f.id === 'experiencia_profissional' || f.id === 'formacao_academica' || f.id === 'especialidades' ? 'md:col-span-2' : ''}`}
                 >
                   <Label htmlFor={f.id}>{f.label}</Label>
                   <Input
