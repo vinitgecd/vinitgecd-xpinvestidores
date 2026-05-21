@@ -14,6 +14,18 @@ export function Header() {
 
   const isHomePage = location.pathname === '/'
 
+  const isLinkActive = (path: string) => {
+    if (path === '/') return location.pathname === '/'
+    if (path.startsWith('/#')) return false
+    return location.pathname.startsWith(path)
+  }
+
+  const getNavLinkClass = (path: string) =>
+    cn(
+      'text-sm font-medium transition-colors',
+      isLinkActive(path) ? 'text-[#4da2ff]' : 'text-white/90 hover:text-[#4da2ff]',
+    )
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
@@ -67,40 +79,62 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
-          <a
-            href="/#argentum"
-            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-          >
-            A Argentum
-          </a>
-          <a
-            href="/#assessores"
-            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-          >
-            Assessores
-          </a>
-          {isHomePage && (
-            <a
-              href="/#contato"
-              className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-            >
-              Fale conosco
-            </a>
+          {user?.role === 'admin' ? (
+            <>
+              <Link
+                to="/admin/painel-de-controle"
+                className={getNavLinkClass('/admin/painel-de-controle')}
+              >
+                Dashboard
+              </Link>
+              <Link to="/configuracoes" className={getNavLinkClass('/configuracoes')}>
+                A Argentum
+              </Link>
+              <Link to="/admin/assessores" className={getNavLinkClass('/admin/assessores')}>
+                Assessores
+              </Link>
+              <Link to="/clientes" className={getNavLinkClass('/clientes')}>
+                Clientes
+              </Link>
+              <Link to="/contatos" className={getNavLinkClass('/contatos')}>
+                Contatos
+              </Link>
+            </>
+          ) : user?.role === 'assessor' ? (
+            <>
+              <Link to="/meus-clientes" className={getNavLinkClass('/meus-clientes')}>
+                Dashboard
+              </Link>
+            </>
+          ) : (
+            <>
+              <a
+                href="/#argentum"
+                className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+              >
+                A Argentum
+              </a>
+              <a
+                href="/#assessores"
+                className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+              >
+                Assessores
+              </a>
+              {isHomePage && (
+                <a
+                  href="/#contato"
+                  className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                >
+                  Fale conosco
+                </a>
+              )}
+            </>
           )}
 
           {user ? (
             <div className="flex items-center gap-4 ml-4 pl-4 border-l border-white/20">
-              <Link
-                to={user.role === 'admin' ? '/clientes' : '/meus-clientes'}
-                className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-              >
-                Dashboard
-              </Link>
               {(user.role === 'assessor' || user.role === 'admin') && (
-                <Link
-                  to="/perfil-do-avaliador"
-                  className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-                >
+                <Link to="/perfil-do-avaliador" className={getNavLinkClass('/perfil-do-avaliador')}>
                   Meu Perfil
                 </Link>
               )}
@@ -141,43 +175,88 @@ export function Header() {
       {/* Mobile Nav */}
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-[#111111]/95 backdrop-blur-md border-b border-white/10 shadow-xl py-4 flex flex-col items-center gap-4 animate-in slide-in-from-top-2">
-          <a
-            href="/#argentum"
-            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            A Argentum
-          </a>
-          <a
-            href="/#assessores"
-            className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Assessores
-          </a>
-          {isHomePage && (
-            <a
-              href="/#contato"
-              className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Fale conosco
-            </a>
-          )}
-
-          {user ? (
-            <div className="flex flex-col items-center gap-4 mt-2 pt-4 border-t border-white/10 w-full">
+          {user?.role === 'admin' ? (
+            <>
               <Link
-                to={user.role === 'admin' ? '/clientes' : '/meus-clientes'}
-                className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                to="/admin/painel-de-controle"
+                className={getNavLinkClass('/admin/painel-de-controle')}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Dashboard
               </Link>
+              <Link
+                to="/configuracoes"
+                className={getNavLinkClass('/configuracoes')}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                A Argentum
+              </Link>
+              <Link
+                to="/admin/assessores"
+                className={getNavLinkClass('/admin/assessores')}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Assessores
+              </Link>
+              <Link
+                to="/clientes"
+                className={getNavLinkClass('/clientes')}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Clientes
+              </Link>
+              <Link
+                to="/contatos"
+                className={getNavLinkClass('/contatos')}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contatos
+              </Link>
+            </>
+          ) : user?.role === 'assessor' ? (
+            <>
+              <Link
+                to="/meus-clientes"
+                className={getNavLinkClass('/meus-clientes')}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+            </>
+          ) : (
+            <>
+              <a
+                href="/#argentum"
+                className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                A Argentum
+              </a>
+              <a
+                href="/#assessores"
+                className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Assessores
+              </a>
+              {isHomePage && (
+                <a
+                  href="/#contato"
+                  className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Fale conosco
+                </a>
+              )}
+            </>
+          )}
+
+          {user ? (
+            <div className="flex flex-col items-center gap-4 mt-2 pt-4 border-t border-white/10 w-full">
               {(user.role === 'assessor' || user.role === 'admin') && (
                 <Link
                   to="/perfil-do-avaliador"
-                  className="text-sm font-medium text-white/90 hover:text-[#4da2ff] transition-colors"
+                  className={getNavLinkClass('/perfil-do-avaliador')}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Meu Perfil

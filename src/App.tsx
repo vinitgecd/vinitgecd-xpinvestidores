@@ -16,6 +16,7 @@ import NovoCliente from './pages/clientes/NovoCliente'
 import ClientesList from './pages/clientes/ClientesList'
 import ContatosList from './pages/admin/ContatosList'
 import NovoContato from './pages/admin/NovoContato'
+import AssessoresList from './pages/admin/AssessoresList'
 import { AuthProvider, useAuth } from './hooks/use-auth'
 import React, { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -69,6 +70,7 @@ const App = () => (
             />
             <Route path="/contatos" element={<ContatosList />} />
             <Route path="/contatos/novo" element={<NovoContato />} />
+            <Route path="/admin/assessores" element={<AssessoresList />} />
             {/* ADD ALL CUSTOM ROUTES MUST BE ADDED HERE */}
           </Route>
           <Route path="*" element={<NotFound />} />
