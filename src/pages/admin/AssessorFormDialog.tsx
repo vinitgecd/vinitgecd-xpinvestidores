@@ -60,6 +60,8 @@ export function AssessorFormDialog({
     setErrors({})
     try {
       let dataToSave = { ...formData }
+      let createdUserId: string | null = null
+
       if (!assessor) {
         const user = await createUser({
           email: formData.email,
@@ -69,6 +71,7 @@ export function AssessorFormDialog({
           name: formData.nome,
           whatsapp: formData.whatsapp,
         })
+        createdUserId = user.id
         dataToSave.user_id = user.id
       }
       delete dataToSave.email
@@ -85,15 +88,27 @@ export function AssessorFormDialog({
             console.error('Failed to update user', e)
           }
         }
-        toast({ title: 'Assessor atualizado!' })
+        toast({ title: 'Sucesso', description: 'Assessor atualizado com sucesso!' })
       } else {
-        await createAssessor(dataToSave)
-        toast({ title: 'Assessor criado!' })
+        try {
+          await createAssessor(dataToSave)
+          toast({ title: 'Sucesso', description: 'Assessor criado com sucesso!' })
+        } catch (err) {
+          if (createdUserId)
+            await pb
+              .collection('users')
+              .delete(createdUserId)
+              .catch(() => {})
+          throw err
+        }
       }
       onSuccess()
       onOpenChange(false)
     } catch (err: any) {
       const fieldErrs = extractFieldErrors(err)
+      if (fieldErrs.email) {
+        fieldErrs.email = 'Este email já está cadastrado.'
+      }
       if (Object.keys(fieldErrs).length > 0) setErrors(fieldErrs)
       else toast({ variant: 'destructive', title: 'Erro', description: err.message })
     } finally {
@@ -121,6 +136,7 @@ export function AssessorFormDialog({
                 <div className="space-y-2">
                   <Label>Email *</Label>
                   <Input
+                    type="email"
                     value={formData.email || ''}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
