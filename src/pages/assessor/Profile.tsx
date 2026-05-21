@@ -197,8 +197,12 @@ export default function AssessorProfile() {
           {targetAssessorId && user.role === 'admin' ? 'Editar Perfil do Assessor' : 'Meu Perfil'}
         </h1>
         {targetAssessorId && user.role === 'admin' && (
-          <Button variant="outline" asChild>
-            <Link to="/admin/dashboard" className="gap-2">
+          <Button
+            variant="outline"
+            asChild
+            className="text-slate-900 hover:text-slate-800 border-slate-300"
+          >
+            <Link to="/admin/painel-de-controle" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" /> Voltar ao Dashboard
             </Link>
           </Button>
