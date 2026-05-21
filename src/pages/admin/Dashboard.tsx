@@ -111,7 +111,7 @@ export default function AdminDashboard() {
             <RefreshCw className="h-4 w-4" /> Atualizar
           </Button>
           <Button onClick={openCreate} size="sm" className="bg-[#003366] text-white gap-2">
-            <Plus className="h-4 w-4" /> Novo Assessor
+            + Novo Assessor
           </Button>
         </div>
       </div>

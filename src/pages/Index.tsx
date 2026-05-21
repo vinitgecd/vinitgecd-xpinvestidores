@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/use-auth'
 import { AlertCircle, RefreshCw, Briefcase, GraduationCap, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -13,6 +15,7 @@ import { AdvisorWhatsAppButton } from '@/components/AdvisorWhatsAppButton'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
 
 export default function Index() {
+  const { user } = useAuth()
   const [status, setStatus] = useState<'loading' | 'error' | 'empty' | 'success'>('loading')
   const [advisors, setAdvisors] = useState<Assessor[]>([])
 
@@ -33,6 +36,10 @@ export default function Index() {
   useEffect(() => {
     loadData()
   }, [])
+
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin/painel-de-controle" replace />
+  }
 
   const parseList = (str: string) =>
     str

@@ -26,7 +26,7 @@ const DashboardRouter = () => {
   const { user, loading } = useAuth()
   if (loading) return null
   if (!user) return <Navigate to="/login" replace />
-  if (user.role === 'admin') return <Navigate to="/clientes" replace />
+  if (user.role === 'admin') return <Navigate to="/admin/painel-de-controle" replace />
   return <Navigate to="/meus-clientes" replace />
 }
 
@@ -46,7 +46,7 @@ const App = () => (
             <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
             <Route path="/alterar-senha" element={<AlterarSenha />} />
             <Route path="/dashboard" element={<DashboardRouter />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/painel-de-controle" element={<AdminDashboard />} />
             <Route path="/perfil-do-avaliador" element={<AssessorProfile />} />
             <Route path="/perfil-do-avaliador/:id" element={<AssessorProfile />} />
             <Route path="/meus-clientes" element={<MeusClientes />} />

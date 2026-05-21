@@ -67,6 +67,7 @@ export function AssessorFormDialog({
           passwordConfirm: formData.password,
           role: 'assessor',
           name: formData.nome,
+          whatsapp: formData.whatsapp,
         })
         dataToSave.user_id = user.id
       }
@@ -77,23 +78,16 @@ export function AssessorFormDialog({
         await updateAssessor(assessor.id, dataToSave)
         if (dataToSave.whatsapp !== undefined) {
           try {
-            await pb.collection('users').update(assessor.user_id, { whatsapp: dataToSave.whatsapp })
+            await pb
+              .collection('users')
+              .update(assessor.user_id, { whatsapp: dataToSave.whatsapp, name: dataToSave.nome })
           } catch (e) {
-            console.error('Failed to update user whatsapp', e)
+            console.error('Failed to update user', e)
           }
         }
         toast({ title: 'Assessor atualizado!' })
       } else {
-        const newAssessor = await createAssessor(dataToSave)
-        if (dataToSave.whatsapp !== undefined && newAssessor.user_id) {
-          try {
-            await pb
-              .collection('users')
-              .update(newAssessor.user_id, { whatsapp: dataToSave.whatsapp })
-          } catch (e) {
-            console.error('Failed to update user whatsapp', e)
-          }
-        }
+        await createAssessor(dataToSave)
         toast({ title: 'Assessor criado!' })
       }
       onSuccess()
